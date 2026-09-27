@@ -59,8 +59,8 @@ export function EntryAnalysis({
       const res = await retry({ data: { entryId } });
       if (!res.ok) setMsg(res.error);
       onUpdated();
-    } catch {
-      setMsg("Connection problem. Try again.");
+    } catch (e) {
+      setMsg(e instanceof Error && /unauthori[sz]ed/i.test(e.message) ? "Your sign-in has expired. Please sign in again." : "Connection problem. Try again.");
     } finally {
       setBusy(false);
     }

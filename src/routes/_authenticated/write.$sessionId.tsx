@@ -22,6 +22,12 @@ export const Route = createFileRoute("/_authenticated/write/$sessionId")({
   component: WriteSession,
 });
 
+function authOrNetwork(e: unknown) {
+  return e instanceof Error && /unauthori[sz]ed/i.test(e.message)
+    ? "Your sign-in has expired. Please sign in again to keep writing — your words so far are saved."
+    : "Connection problem. Check your internet and try again.";
+}
+
 function WriteSession() {
   const { sessionId } = Route.useParams();
   const navigate = useNavigate();
@@ -66,8 +72,8 @@ function WriteSession() {
         setReplyError(res.error);
         await messages.refetch();
       }
-    } catch {
-      setReplyError("Connection problem. Check your internet and try again.");
+    } catch (e) {
+      setReplyError(authOrNetwork(e));
     } finally {
       busyRef.current = false;
       setSending(false);
@@ -83,8 +89,8 @@ function WriteSession() {
       const res = await retryFn({ data: { sessionId } });
       if (res.ok) append(res.assistantMessage);
       else setReplyError(res.error);
-    } catch {
-      setReplyError("Connection problem. Check your internet and try again.");
+    } catch (e) {
+      setReplyError(authOrNetwork(e));
     } finally {
       busyRef.current = false;
       setSending(false);
