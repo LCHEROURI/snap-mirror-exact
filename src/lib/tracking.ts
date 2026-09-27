@@ -10,7 +10,7 @@ function ok<T>(r: { data: T; error: unknown }): NonNullable<T> {
   if (r.error) throw r.error;
   return (r.data ?? []) as NonNullable<T>;
 }
-function one<T>(r: { data: T | null; error: unknown }): T | null {
+function one<T>(r: { data: T; error: unknown }): T {
   if (r.error) throw r.error;
   return r.data;
 }
