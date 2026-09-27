@@ -14,6 +14,78 @@ export type Database = {
   }
   public: {
     Tables: {
+      entry_people: {
+        Row: {
+          created_at: string
+          entry_id: string
+          person_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          entry_id: string
+          person_id: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          entry_id?: string
+          person_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entry_people_entry_id_fkey"
+            columns: ["entry_id"]
+            isOneToOne: false
+            referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entry_people_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      entry_topics: {
+        Row: {
+          created_at: string
+          entry_id: string
+          topic_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          entry_id: string
+          topic_id: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          entry_id?: string
+          topic_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entry_topics_entry_id_fkey"
+            columns: ["entry_id"]
+            isOneToOne: false
+            referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entry_topics_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       goal_checkins: {
         Row: {
           created_at: string
@@ -29,7 +101,7 @@ export type Database = {
           id?: string
           note?: string | null
           progress?: number | null
-          user_id: string
+          user_id?: string
         }
         Update: {
           created_at?: string
@@ -52,8 +124,10 @@ export type Database = {
       goals: {
         Row: {
           created_at: string
+          created_from_entry_id: string | null
           description: string | null
           id: string
+          next_actions: Json
           progress: number
           status: string
           target_date: string | null
@@ -63,19 +137,23 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          created_from_entry_id?: string | null
           description?: string | null
           id?: string
+          next_actions?: Json
           progress?: number
           status?: string
           target_date?: string | null
           title: string
           updated_at?: string
-          user_id: string
+          user_id?: string
         }
         Update: {
           created_at?: string
+          created_from_entry_id?: string | null
           description?: string | null
           id?: string
+          next_actions?: Json
           progress?: number
           status?: string
           target_date?: string | null
@@ -83,7 +161,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "goals_created_from_entry_id_fkey"
+            columns: ["created_from_entry_id"]
+            isOneToOne: false
+            referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       journal_entries: {
         Row: {
@@ -93,6 +179,7 @@ export type Database = {
           analyzed_at: string | null
           completed_at: string
           created_at: string
+          dismissed_goal_candidates: string[]
           id: string
           message_count: number
           mood_score: number | null
@@ -116,6 +203,7 @@ export type Database = {
           analyzed_at?: string | null
           completed_at?: string
           created_at?: string
+          dismissed_goal_candidates?: string[]
           id?: string
           message_count?: number
           mood_score?: number | null
@@ -139,6 +227,7 @@ export type Database = {
           analyzed_at?: string | null
           completed_at?: string
           created_at?: string
+          dismissed_goal_candidates?: string[]
           id?: string
           message_count?: number
           mood_score?: number | null
@@ -336,6 +425,8 @@ export type Database = {
       mood_entries: {
         Row: {
           id: string
+          journal_entry_id: string | null
+          label: string | null
           note: string | null
           recorded_at: string
           score: number
@@ -344,14 +435,18 @@ export type Database = {
         }
         Insert: {
           id?: string
+          journal_entry_id?: string | null
+          label?: string | null
           note?: string | null
           recorded_at?: string
           score: number
           session_id?: string | null
-          user_id: string
+          user_id?: string
         }
         Update: {
           id?: string
+          journal_entry_id?: string | null
+          label?: string | null
           note?: string | null
           recorded_at?: string
           score?: number
@@ -359,6 +454,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "mood_entries_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
+            referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "mood_entries_session_id_fkey"
             columns: ["session_id"]
@@ -373,21 +475,30 @@ export type Database = {
           created_at: string
           id: string
           name: string
+          name_key: string | null
+          notes: string | null
           relationship: string | null
+          updated_at: string
           user_id: string
         }
         Insert: {
           created_at?: string
           id?: string
           name: string
+          name_key?: string | null
+          notes?: string | null
           relationship?: string | null
-          user_id: string
+          updated_at?: string
+          user_id?: string
         }
         Update: {
           created_at?: string
           id?: string
           name?: string
+          name_key?: string | null
+          notes?: string | null
           relationship?: string | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -576,18 +687,21 @@ export type Database = {
           created_at: string
           id: string
           name: string
+          updated_at: string
           user_id: string
         }
         Insert: {
           created_at?: string
           id?: string
           name: string
-          user_id: string
+          updated_at?: string
+          user_id?: string
         }
         Update: {
           created_at?: string
           id?: string
           name?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -651,6 +765,14 @@ export type Database = {
           memory_type: string
           similarity: number
         }[]
+      }
+      merge_people: {
+        Args: { source_id: string; target_id: string }
+        Returns: undefined
+      }
+      merge_topics: {
+        Args: { source_id: string; target_id: string }
+        Returns: undefined
       }
     }
     Enums: {

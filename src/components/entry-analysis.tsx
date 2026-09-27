@@ -88,26 +88,10 @@ export function EntryAnalysis({
         {narrative && <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{narrative}</p>}
         <p className="mt-3 text-[0.7rem] text-muted-foreground">AI-generated reflection — observations, not conclusions.</p>
       </div>
-      <Chips label="Topics" items={analysis.topics} />
-      <Chips label="People mentioned" items={analysis.people} />
       <Chips label="Feelings" items={analysis.emotions} />
       <Bullets label="Decisions" items={analysis.decisions} />
       <Bullets label="Wins" items={analysis.wins} />
       <Bullets label="Concerns" items={analysis.concerns} />
-      {analysis.goal_candidates.length > 0 && (
-        <div>
-          <h3 className="text-xs uppercase tracking-wide text-muted-foreground">Possible goals</h3>
-          <ul className="mt-2 space-y-2">
-            {analysis.goal_candidates.map((g) => (
-              <li key={g.title} className="rounded-xl border border-border px-4 py-3 text-sm">
-                <p>I noticed a possible goal: <span className="font-medium">{g.title}</span></p>
-                {g.next_action && <p className="mt-1 text-muted-foreground">A small next step: {g.next_action}</p>}
-              </li>
-            ))}
-          </ul>
-          <p className="mt-2 text-xs text-muted-foreground">Nothing is added to your goals automatically. Adding goals arrives in a later update.</p>
-        </div>
-      )}
     </section>
   );
 }

@@ -104,7 +104,7 @@ export async function fetchEntries(filters: EntryFilters = {}) {
 export async function fetchEntry(id: string) {
   const { data, error } = await supabase
     .from("journal_entries")
-    .select("id, title, preview, summary, narrative, analysis, analysis_status, analysis_error, session_type, mood_score, started_at, completed_at, session_id, word_count")
+    .select("id, title, preview, summary, narrative, analysis, analysis_status, analysis_error, session_type, mood_score, started_at, completed_at, session_id, word_count, dismissed_goal_candidates")
     .eq("id", id)
     .maybeSingle();
   if (error) throw error;
