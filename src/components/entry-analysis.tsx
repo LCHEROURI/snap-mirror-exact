@@ -12,7 +12,9 @@ function Chips({ label, items }: { label: string; items: string[] }) {
       <h3 className="text-xs uppercase tracking-wide text-muted-foreground">{label}</h3>
       <ul className="mt-2 flex flex-wrap gap-2">
         {items.map((t) => (
-          <li key={t} className="rounded-full border border-border bg-card px-3 py-1 text-sm">{t}</li>
+          <li key={t} className="rounded-full border border-border bg-card px-3 py-1 text-sm">
+            {t}
+          </li>
         ))}
       </ul>
     </div>
@@ -25,7 +27,9 @@ function Bullets({ label, items }: { label: string; items: string[] }) {
     <div>
       <h3 className="text-xs uppercase tracking-wide text-muted-foreground">{label}</h3>
       <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-relaxed">
-        {items.map((t) => <li key={t}>{t}</li>)}
+        {items.map((t) => (
+          <li key={t}>{t}</li>
+        ))}
       </ul>
     </div>
   );
@@ -60,7 +64,11 @@ export function EntryAnalysis({
       if (!res.ok) setMsg(res.error);
       onUpdated();
     } catch (e) {
-      setMsg(e instanceof Error && /unauthori[sz]ed/i.test(e.message) ? "Your sign-in has expired. Please sign in again." : "Connection problem. Try again.");
+      setMsg(
+        e instanceof Error && /unauthori[sz]ed/i.test(e.message)
+          ? "Your sign-in has expired. Please sign in again."
+          : "Connection problem. Try again.",
+      );
     } finally {
       setBusy(false);
     }
@@ -69,9 +77,18 @@ export function EntryAnalysis({
   if (status !== "complete" || !analysis) {
     return (
       <section className="mt-8 rounded-2xl border border-dashed border-border px-5 py-6">
-        <p className="font-serif text-lg">{status === "failed" ? "The reflection summary wasn't created" : "No reflection summary yet"}</p>
+        <p className="font-serif text-lg">
+          {status === "failed"
+            ? "The reflection summary wasn't created"
+            : "No reflection summary yet"}
+        </p>
         <p className="mt-1 text-sm text-muted-foreground">
-          {msg ?? error ?? (status === "pending" ? "Your entry is saved. Tap below to create its summary." : "Your transcript is saved safely.")} Your transcript is untouched.
+          {msg ??
+            error ??
+            (status === "pending"
+              ? "Your entry is saved. Tap below to create its summary."
+              : "Your transcript is saved safely.")}{" "}
+          Your transcript is untouched.
         </p>
         <Button className="mt-4" variant="outline" onClick={run} disabled={busy}>
           {busy ? <Loader2 className="size-4 animate-spin" /> : <RefreshCw className="size-4" />}
@@ -85,8 +102,12 @@ export function EntryAnalysis({
     <section className="mt-8 space-y-6">
       <div className="rounded-2xl border border-border bg-card p-5">
         <p className="text-[0.95rem] leading-relaxed">{summary}</p>
-        {narrative && <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{narrative}</p>}
-        <p className="mt-3 text-[0.7rem] text-muted-foreground">AI-generated reflection — observations, not conclusions.</p>
+        {narrative && (
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{narrative}</p>
+        )}
+        <p className="mt-3 text-[0.7rem] text-muted-foreground">
+          AI-generated reflection — observations, not conclusions.
+        </p>
       </div>
       <Chips label="Feelings" items={analysis.emotions} />
       <Bullets label="Decisions" items={analysis.decisions} />

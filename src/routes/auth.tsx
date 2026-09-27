@@ -81,7 +81,10 @@ function AuthPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-6 py-16">
       <div className="w-full max-w-sm">
-        <Link to="/" className="font-serif text-sm tracking-[0.3em] text-muted-foreground uppercase">
+        <Link
+          to="/"
+          className="font-serif text-sm tracking-[0.3em] text-muted-foreground uppercase"
+        >
           Reflective
         </Link>
         <h1 className="mt-6 font-serif text-3xl leading-tight tracking-tight text-foreground">

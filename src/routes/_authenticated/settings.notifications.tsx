@@ -18,18 +18,41 @@ function NotificationSettings() {
   if (q.isError || !q.data) return <LoadError onRetry={() => q.refetch()} />;
   const p = q.data;
   return (
-    <Section title="Notifications" description="Reflective doesn't send notifications yet. These choices are saved so they apply once reminders are available.">
-      <Row id="weekly" label="Weekly reflection ready" hint="Let me know when a new weekly reflection can be generated.">
-        <Switch id="weekly" checked={p.weekly_report_enabled} onCheckedChange={(v) => save.mutate({ weekly_report_enabled: v })} />
+    <Section
+      title="Notifications"
+      description="Reflective doesn't send notifications yet. These choices are saved so they apply once reminders are available."
+    >
+      <Row
+        id="weekly"
+        label="Weekly reflection ready"
+        hint="Let me know when a new weekly reflection can be generated."
+      >
+        <Switch
+          id="weekly"
+          checked={p.weekly_report_enabled}
+          onCheckedChange={(v) => save.mutate({ weekly_report_enabled: v })}
+        />
       </Row>
       <Row id="remind" label="Reflection reminders" hint="A gentle nudge to reflect.">
-        <Switch id="remind" checked={p.reflection_reminders_enabled} onCheckedChange={(v) => save.mutate({ reflection_reminders_enabled: v })} />
+        <Switch
+          id="remind"
+          checked={p.reflection_reminders_enabled}
+          onCheckedChange={(v) => save.mutate({ reflection_reminders_enabled: v })}
+        />
       </Row>
-      <div className={p.reflection_reminders_enabled ? "" : "pointer-events-none opacity-50"} aria-disabled={!p.reflection_reminders_enabled}>
+      <div
+        className={p.reflection_reminders_enabled ? "" : "pointer-events-none opacity-50"}
+        aria-disabled={!p.reflection_reminders_enabled}
+      >
         <ChoiceGroup
           label="Reminder time"
-          value={(p.reminder_preference === "morning" ? "morning" : "evening") as "morning" | "evening"}
-          options={[{ value: "morning", label: "Morning" }, { value: "evening", label: "Evening" }]}
+          value={
+            (p.reminder_preference === "morning" ? "morning" : "evening") as "morning" | "evening"
+          }
+          options={[
+            { value: "morning", label: "Morning" },
+            { value: "evening", label: "Evening" },
+          ]}
           onChange={(v) => save.mutate({ reminder_preference: v })}
         />
       </div>

@@ -29,7 +29,8 @@ describe("Ask My Journal date ranges use the user's timezone", () => {
 
   it("invalid or empty timezones fall back to UTC", () => {
     const now = new Date("2026-05-05T10:00:00Z");
-    for (const tz of ["Not/AZone", "", null]) expect(iso(parseRange("today", tz, now)!.from)).toBe("2026-05-05T00:00:00.000Z");
+    for (const tz of ["Not/AZone", "", null])
+      expect(iso(parseRange("today", tz, now)!.from)).toBe("2026-05-05T00:00:00.000Z");
   });
 
   it("no date phrase gives no range", () => {

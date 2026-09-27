@@ -13,23 +13,43 @@ export const Route = createFileRoute("/_authenticated/people/")({
 
 function PeoplePage() {
   const sync = useServerFn(syncTags);
-  const q = useQuery({ queryKey: ["people"], queryFn: async () => { await sync().catch(() => undefined); return fetchPeople(); } });
+  const q = useQuery({
+    queryKey: ["people"],
+    queryFn: async () => {
+      await sync().catch(() => undefined);
+      return fetchPeople();
+    },
+  });
   return (
     <AppShell>
       <PageHeader title="People" subtitle="Who shows up in your reflections." />
       <div className="max-w-2xl px-5 sm:px-10">
-        <Link to="/insights" className="text-sm text-muted-foreground underline underline-offset-2">← Insights</Link>
+        <Link to="/insights" className="text-sm text-muted-foreground underline underline-offset-2">
+          ← Insights
+        </Link>
         <div className="mt-4">
-          {q.isLoading ? <Loading /> : q.isError ? <LoadError onRetry={() => q.refetch()} /> : !q.data!.length ? (
+          {q.isLoading ? (
+            <Loading />
+          ) : q.isError ? (
+            <LoadError onRetry={() => q.refetch()} />
+          ) : !q.data!.length ? (
             <Empty title="People you mention often will appear here." />
           ) : (
             <ul className="grid gap-3 sm:grid-cols-2">
               {q.data!.map((p) => (
                 <li key={p.id}>
-                  <Link to="/people/$personId" params={{ personId: p.id }} className="block rounded-2xl border border-border bg-card p-4 hover:bg-secondary">
+                  <Link
+                    to="/people/$personId"
+                    params={{ personId: p.id }}
+                    className="block rounded-2xl border border-border bg-card p-4 hover:bg-secondary"
+                  >
                     <span className="block font-medium">{p.name}</span>
-                    {p.relationship && <span className="block text-sm text-muted-foreground">{p.relationship}</span>}
-                    <span className="mt-2 block text-xs text-muted-foreground">{p.count} {p.count === 1 ? "mention" : "mentions"} · last {shortDate(p.last)}</span>
+                    {p.relationship && (
+                      <span className="block text-sm text-muted-foreground">{p.relationship}</span>
+                    )}
+                    <span className="mt-2 block text-xs text-muted-foreground">
+                      {p.count} {p.count === 1 ? "mention" : "mentions"} · last {shortDate(p.last)}
+                    </span>
                   </Link>
                 </li>
               ))}

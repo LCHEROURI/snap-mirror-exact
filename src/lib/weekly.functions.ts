@@ -9,20 +9,35 @@ import { WeeklyError, generateWeeklyReport } from "./ai/weekly.server";
 export const generateWeekly = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) =>
-    z.object({
-      week_start: z.string().regex(WEEK_RE).optional(),
-      regenerate: z.boolean().optional(),
-      timezone: z.string().max(64).optional(),
-    }).parse(d),
+    z
+      .object({
+        week_start: z.string().regex(WEEK_RE).optional(),
+        regenerate: z.boolean().optional(),
+        timezone: z.string().max(64).optional(),
+      })
+      .parse(d),
   )
   .handler(async ({ data, context }) => {
     try {
       if (!(await allowAi(context.supabase, "weekly"))) return RATE_LIMITED;
-      const r = await generateWeeklyReport(context.supabase, context.userId, { weekStart: data.week_start, regenerate: data.regenerate, timezone: data.timezone });
-      return { ok: true as const, status: r.status, id: r.report.id, week_start: r.report.week_start };
+      const r = await generateWeeklyReport(context.supabase, context.userId, {
+        weekStart: data.week_start,
+        regenerate: data.regenerate,
+        timezone: data.timezone,
+      });
+      return {
+        ok: true as const,
+        status: r.status,
+        id: r.report.id,
+        week_start: r.report.week_start,
+      };
     } catch (e) {
       if (e instanceof WeeklyError) return { ok: false as const, code: e.code, error: e.message };
       console.error("[weekly] unexpected", (e as Error)?.name);
-      return { ok: false as const, code: "unknown", error: "Something went wrong. Please try again." };
+      return {
+        ok: false as const,
+        code: "unknown",
+        error: "Something went wrong. Please try again.",
+      };
     }
   });

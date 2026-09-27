@@ -15,11 +15,21 @@ function SettingsLayout() {
     <AppShell>
       <div className="px-5 pt-8 sm:px-10 sm:pt-12">
         {atHub ? null : (
-          <Link to="/settings" className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground md:hidden">
+          <Link
+            to="/settings"
+            className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground md:hidden"
+          >
             <ArrowLeft className="size-4" /> Settings
           </Link>
         )}
-        <h1 className={cn("font-serif text-3xl tracking-tight sm:text-4xl", !atHub && "sr-only md:not-sr-only")}>Settings</h1>
+        <h1
+          className={cn(
+            "font-serif text-3xl tracking-tight sm:text-4xl",
+            !atHub && "sr-only md:not-sr-only",
+          )}
+        >
+          Settings
+        </h1>
       </div>
       <div className="gap-10 px-5 pt-6 sm:px-10 md:flex">
         <nav aria-label="Settings sections" className="hidden w-48 shrink-0 md:block">
@@ -30,7 +40,9 @@ function SettingsLayout() {
                   to={s.to}
                   className={cn(
                     "block rounded-lg px-3 py-2 text-sm transition-colors",
-                    pathname.startsWith(s.to) ? "bg-secondary text-foreground" : "text-muted-foreground hover:bg-secondary/60",
+                    pathname.startsWith(s.to)
+                      ? "bg-secondary text-foreground"
+                      : "text-muted-foreground hover:bg-secondary/60",
                   )}
                 >
                   {s.label}

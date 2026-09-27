@@ -9,7 +9,8 @@ import { profileQueryOptions } from "@/lib/profile";
 import { voiceSupported } from "@/lib/voice/types";
 
 export const Route = createFileRoute("/_authenticated/settings/voice")({
-  head: () => meta("Voice settings", "Turn voice reflections on or off and choose how replies sound."),
+  head: () =>
+    meta("Voice settings", "Turn voice reflections on or off and choose how replies sound."),
   component: VoiceSettings,
 });
 
@@ -33,19 +34,43 @@ function VoiceSettings() {
   const p = q.data;
 
   return (
-    <Section title="Voice" description="Voice reflections are transcribed into your journal. Audio recordings are never stored.">
+    <Section
+      title="Voice"
+      description="Voice reflections are transcribed into your journal. Audio recordings are never stored."
+    >
       {supported === false ? (
         <p role="status" className="rounded-lg bg-secondary p-3 text-sm text-muted-foreground">
-          This browser can't record audio, so voice reflections aren't available here. Try a recent Chrome, Safari or Edge. Your preferences below are still saved to your account.
+          This browser can't record audio, so voice reflections aren't available here. Try a recent
+          Chrome, Safari or Edge. Your preferences below are still saved to your account.
         </p>
       ) : null}
-      <Row id="voice-on" label="Voice reflections" hint="When off, the Voice screen won't start a session.">
-        <Switch id="voice-on" checked={p.voice_enabled} onCheckedChange={(v) => save.mutate({ voice_enabled: v })} />
+      <Row
+        id="voice-on"
+        label="Voice reflections"
+        hint="When off, the Voice screen won't start a session."
+      >
+        <Switch
+          id="voice-on"
+          checked={p.voice_enabled}
+          onCheckedChange={(v) => save.mutate({ voice_enabled: v })}
+        />
       </Row>
-      <Row id="autoplay" label="Play replies aloud" hint="Turn-by-turn voice only. When off, replies appear as text and you keep talking.">
-        <Switch id="autoplay" checked={p.auto_play_responses} disabled={!p.voice_enabled} onCheckedChange={(v) => save.mutate({ auto_play_responses: v })} />
+      <Row
+        id="autoplay"
+        label="Play replies aloud"
+        hint="Turn-by-turn voice only. When off, replies appear as text and you keep talking."
+      >
+        <Switch
+          id="autoplay"
+          checked={p.auto_play_responses}
+          disabled={!p.voice_enabled}
+          onCheckedChange={(v) => save.mutate({ auto_play_responses: v })}
+        />
       </Row>
-      <div className={p.voice_enabled ? "" : "pointer-events-none opacity-50"} aria-disabled={!p.voice_enabled}>
+      <div
+        className={p.voice_enabled ? "" : "pointer-events-none opacity-50"}
+        aria-disabled={!p.voice_enabled}
+      >
         <ChoiceGroup
           label="Reply voice (turn-by-turn)"
           value={(p.voice_name ?? "Kore") as (typeof VOICES)[number]["value"]}
@@ -57,7 +82,17 @@ function VoiceSettings() {
   );
 }
 
-export function Row({ id, label, hint, children }: { id: string; label: string; hint?: string; children: React.ReactNode }) {
+export function Row({
+  id,
+  label,
+  hint,
+  children,
+}: {
+  id: string;
+  label: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="flex items-start justify-between gap-4">
       <div>

@@ -1,5 +1,13 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { BookOpen, CalendarDays, Flag, Mic, MessageCircleQuestion, Sparkles, Settings } from "lucide-react";
+import {
+  BookOpen,
+  CalendarDays,
+  Flag,
+  Mic,
+  MessageCircleQuestion,
+  Sparkles,
+  Settings,
+} from "lucide-react";
 import { useEffect, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { profileQueryOptions } from "@/lib/profile";
@@ -65,7 +73,11 @@ export function AppShell({ children }: { children: ReactNode }) {
             if (to === "/voice")
               return (
                 <li key={to} className="flex flex-1 justify-center">
-                  <Link to="/voice" aria-label="Start a voice reflection" className="-mt-5 grid size-14 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                  <Link
+                    to="/voice"
+                    aria-label="Start a voice reflection"
+                    className="-mt-5 grid size-14 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
                     <Icon className="size-6" />
                   </Link>
                 </li>

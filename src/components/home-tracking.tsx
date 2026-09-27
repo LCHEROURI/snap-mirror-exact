@@ -10,22 +10,40 @@ export function HomeTracking() {
   const topics = useQuery({ queryKey: ["topics"], queryFn: fetchTopics });
   const moods = useQuery({ queryKey: ["moods"], queryFn: fetchMoods });
   const goal = goals.data?.find((g) => g.status === "active");
-  const topic = [...(topics.data ?? [])].filter((t) => t.last).sort((a, b) => (b.last ?? "").localeCompare(a.last ?? ""))[0];
+  const topic = [...(topics.data ?? [])]
+    .filter((t) => t.last)
+    .sort((a, b) => (b.last ?? "").localeCompare(a.last ?? ""))[0];
   const today = new Date().toDateString();
   const loggedToday = moods.data?.some((m) => new Date(m.recorded_at).toDateString() === today);
 
   return (
     <div className="mt-6 grid gap-3 sm:grid-cols-2">
-      <Link to={goal ? "/goals/$goalId" : "/goals"} params={goal ? { goalId: goal.id } : {}} className="rounded-2xl border border-border bg-card p-4 hover:bg-secondary">
-        <span className="block text-xs uppercase tracking-wide text-muted-foreground">Current goal</span>
+      <Link
+        to={goal ? "/goals/$goalId" : "/goals"}
+        params={goal ? { goalId: goal.id } : {}}
+        className="rounded-2xl border border-border bg-card p-4 hover:bg-secondary"
+      >
+        <span className="block text-xs uppercase tracking-wide text-muted-foreground">
+          Current goal
+        </span>
         <span className="mt-1 block text-sm">{goal ? goal.title : "No active goals yet."}</span>
       </Link>
-      <Link to={topic ? "/topics/$topicId" : "/topics"} params={topic ? { topicId: topic.id } : {}} className="rounded-2xl border border-border bg-card p-4 hover:bg-secondary">
-        <span className="block text-xs uppercase tracking-wide text-muted-foreground">Recent topic</span>
-        <span className="mt-1 block text-sm">{topic ? topic.name : "Topics will appear as your journal grows."}</span>
+      <Link
+        to={topic ? "/topics/$topicId" : "/topics"}
+        params={topic ? { topicId: topic.id } : {}}
+        className="rounded-2xl border border-border bg-card p-4 hover:bg-secondary"
+      >
+        <span className="block text-xs uppercase tracking-wide text-muted-foreground">
+          Recent topic
+        </span>
+        <span className="mt-1 block text-sm">
+          {topic ? topic.name : "Topics will appear as your journal grows."}
+        </span>
       </Link>
       {moods.data && !loggedToday && (
-        <div className="sm:col-span-2"><MoodPicker compact onSaved={() => qc.invalidateQueries({ queryKey: ["moods"] })} /></div>
+        <div className="sm:col-span-2">
+          <MoodPicker compact onSaved={() => qc.invalidateQueries({ queryKey: ["moods"] })} />
+        </div>
       )}
     </div>
   );

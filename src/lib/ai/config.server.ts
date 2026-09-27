@@ -22,7 +22,8 @@ export function voiceConfig() {
     openaiKey: process.env["OPENAI_API_KEY"] || null,
     realtimeModel: process.env["REALTIME_MODEL"] || "gpt-realtime",
     realtimeVoice: process.env["REALTIME_VOICE"] || "marin",
-    realtimeTranscriptionModel: process.env["REALTIME_TRANSCRIPTION_MODEL"] || "gpt-4o-mini-transcribe",
+    realtimeTranscriptionModel:
+      process.env["REALTIME_TRANSCRIPTION_MODEL"] || "gpt-4o-mini-transcribe",
     transcriptionModel: process.env["TRANSCRIPTION_MODEL"] || "google/gemini-3.5-transcribe",
     ttsModel: process.env["TTS_MODEL"] || "google/gemini-3.1-flash-tts-preview",
     ttsVoice: process.env["TTS_VOICE"] || "Kore",

@@ -28,7 +28,9 @@ function ResetPassword() {
 
   useEffect(() => {
     // The emailed link signs the user in with a short-lived recovery session.
-    const { data } = supabase.auth.onAuthStateChange((e) => { if (e === "PASSWORD_RECOVERY" || e === "SIGNED_IN") setReady(true); });
+    const { data } = supabase.auth.onAuthStateChange((e) => {
+      if (e === "PASSWORD_RECOVERY" || e === "SIGNED_IN") setReady(true);
+    });
     supabase.auth.getSession().then(({ data: s }) => setReady((r) => r || !!s.session));
     return () => data.subscription.unsubscribe();
   }, []);
@@ -38,24 +40,41 @@ function ResetPassword() {
     setBusy(true);
     const { error } = await supabase.auth.updateUser({ password: pw });
     setBusy(false);
-    if (error) { toast.error(error.message || "Couldn't update your password."); return; }
+    if (error) {
+      toast.error(error.message || "Couldn't update your password.");
+      return;
+    }
     toast.success("Password updated.");
     navigate({ to: "/journal" });
   }
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-5">
-      <form onSubmit={submit} className="w-full max-w-sm space-y-4 rounded-2xl border border-border bg-card p-6">
+      <form
+        onSubmit={submit}
+        className="w-full max-w-sm space-y-4 rounded-2xl border border-border bg-card p-6"
+      >
         <h1 className="font-serif text-2xl tracking-tight">Choose a new password</h1>
         {ready === false ? (
-          <p className="text-sm text-muted-foreground">This link has expired or was already used. Request a new one from Settings → Account.</p>
+          <p className="text-sm text-muted-foreground">
+            This link has expired or was already used. Request a new one from Settings → Account.
+          </p>
         ) : (
           <>
             <div className="space-y-2">
               <Label htmlFor="pw">New password</Label>
-              <Input id="pw" type="password" minLength={8} autoComplete="new-password" value={pw} onChange={(e) => setPw(e.target.value)} />
+              <Input
+                id="pw"
+                type="password"
+                minLength={8}
+                autoComplete="new-password"
+                value={pw}
+                onChange={(e) => setPw(e.target.value)}
+              />
             </div>
-            <Button type="submit" className="w-full" disabled={busy || pw.length < 8 || !ready}>Update password</Button>
+            <Button type="submit" className="w-full" disabled={busy || pw.length < 8 || !ready}>
+              Update password
+            </Button>
           </>
         )}
       </form>

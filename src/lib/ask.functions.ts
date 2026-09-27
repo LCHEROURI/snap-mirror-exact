@@ -11,10 +11,17 @@ export const askMyJournal = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     try {
       if (!(await allowAi(context.supabase, "ask"))) return RATE_LIMITED;
-      return { ok: true as const, ...(await askJournal(context.supabase, context.userId, data.question)) };
+      return {
+        ok: true as const,
+        ...(await askJournal(context.supabase, context.userId, data.question)),
+      };
     } catch (e) {
       if (e instanceof AskError) return { ok: false as const, code: e.code, error: e.message };
       console.error("[ask] unexpected", (e as Error)?.name);
-      return { ok: false as const, code: "unknown", error: "Something went wrong. Please try again." };
+      return {
+        ok: false as const,
+        code: "unknown",
+        error: "Something went wrong. Please try again.",
+      };
     }
   });

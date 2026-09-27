@@ -7,8 +7,15 @@ import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
-  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { deleteEntry, fetchEntry, fetchMessages, formatDate, renameEntry } from "@/lib/journal";
 import { MessageBubble } from "@/components/message-bubble";
@@ -77,40 +84,76 @@ function EntryDetail() {
     <AppShell>
       <div className="mx-auto max-w-2xl px-5 pt-6 sm:px-10 sm:pt-10">
         <Button variant="ghost" size="sm" asChild className="-ml-3">
-          <Link to="/history"><ArrowLeft className="size-4" /> History</Link>
+          <Link to="/history">
+            <ArrowLeft className="size-4" /> History
+          </Link>
         </Button>
 
         {entry.isLoading ? (
-          <div className="py-20 text-center text-muted-foreground"><Loader2 className="mx-auto size-5 animate-spin" /></div>
+          <div className="py-20 text-center text-muted-foreground">
+            <Loader2 className="mx-auto size-5 animate-spin" />
+          </div>
         ) : entry.isError ? (
           <div className="py-20 text-center">
             <p className="font-serif text-xl">Couldn't load this entry.</p>
-            <Button className="mt-4" variant="outline" onClick={() => entry.refetch()}>Try again</Button>
+            <Button className="mt-4" variant="outline" onClick={() => entry.refetch()}>
+              Try again
+            </Button>
           </div>
         ) : !entry.data ? (
           <div className="py-20 text-center">
             <p className="font-serif text-xl">This entry doesn't exist.</p>
-            <Button className="mt-4" asChild><Link to="/history">Back to history</Link></Button>
+            <Button className="mt-4" asChild>
+              <Link to="/history">Back to history</Link>
+            </Button>
           </div>
         ) : (
           <>
             <header className="mt-4">
               {editing ? (
-                <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); saveTitle(); }}>
-                  <Input value={title} onChange={(e) => setTitle(e.target.value)} autoFocus aria-label="Entry title" maxLength={120} />
-                  <Button type="submit" disabled={busy || !title.trim()}>Save</Button>
-                  <Button type="button" variant="ghost" onClick={() => setEditing(false)}>Cancel</Button>
+                <form
+                  className="flex gap-2"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    saveTitle();
+                  }}
+                >
+                  <Input
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    autoFocus
+                    aria-label="Entry title"
+                    maxLength={120}
+                  />
+                  <Button type="submit" disabled={busy || !title.trim()}>
+                    Save
+                  </Button>
+                  <Button type="button" variant="ghost" onClick={() => setEditing(false)}>
+                    Cancel
+                  </Button>
                 </form>
               ) : (
                 <div className="flex items-start gap-2">
-                  <h1 className="flex-1 font-serif text-3xl leading-tight tracking-tight">{entry.data.title}</h1>
-                  <Button variant="ghost" size="icon" aria-label="Edit title" onClick={() => { setTitle(entry.data!.title); setEditing(true); }}>
+                  <h1 className="flex-1 font-serif text-3xl leading-tight tracking-tight">
+                    {entry.data.title}
+                  </h1>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Edit title"
+                    onClick={() => {
+                      setTitle(entry.data!.title);
+                      setEditing(true);
+                    }}
+                  >
                     <Pencil className="size-4" />
                   </Button>
                 </div>
               )}
               <p className="mt-2 text-sm text-muted-foreground">
-                {formatDate(entry.data.started_at, true)} · {entry.data.session_type === "voice" ? "Voice" : "Written"} · {entry.data.word_count} words
+                {formatDate(entry.data.started_at, true)} ·{" "}
+                {entry.data.session_type === "voice" ? "Voice" : "Written"} ·{" "}
+                {entry.data.word_count} words
               </p>
             </header>
 
@@ -121,7 +164,10 @@ function EntryDetail() {
               summary={entry.data.summary}
               narrative={entry.data.narrative}
               analysis={entry.data.analysis as unknown as JournalAnalysis | null}
-              onUpdated={() => { entry.refetch(); qc.invalidateQueries({ queryKey: ["entries"] }); }}
+              onUpdated={() => {
+                entry.refetch();
+                qc.invalidateQueries({ queryKey: ["entries"] });
+              }}
             />
             {entry.data.analysis_status === "complete" && (
               <EntryTracking
@@ -136,10 +182,14 @@ function EntryDetail() {
               {transcript.isLoading ? (
                 <Loader2 className="mt-4 size-5 animate-spin text-muted-foreground" />
               ) : transcript.isError ? (
-                <Button className="mt-4" variant="outline" onClick={() => transcript.refetch()}>Retry loading transcript</Button>
+                <Button className="mt-4" variant="outline" onClick={() => transcript.refetch()}>
+                  Retry loading transcript
+                </Button>
               ) : (
                 <ol className="mt-4 flex flex-col gap-4">
-                  {(transcript.data ?? []).map((m) => <MessageBubble key={m.id} m={m} />)}
+                  {(transcript.data ?? []).map((m) => (
+                    <MessageBubble key={m.id} m={m} />
+                  ))}
                 </ol>
               )}
             </section>
@@ -147,18 +197,24 @@ function EntryDetail() {
             <div className="mt-12 border-t border-border pt-6">
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="outline" className="text-destructive"><Trash2 className="size-4" /> Delete entry</Button>
+                  <Button variant="outline" className="text-destructive">
+                    <Trash2 className="size-4" /> Delete entry
+                  </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle>Delete this entry?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This permanently removes the entry, its transcript and any mood check-in saved with it. This can't be undone. Memories, goals, topics and people that came from it are kept.
+                      This permanently removes the entry, its transcript and any mood check-in saved
+                      with it. This can't be undone. Memories, goals, topics and people that came
+                      from it are kept.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Keep it</AlertDialogCancel>
-                    <AlertDialogAction onClick={remove} disabled={busy}>Delete</AlertDialogAction>
+                    <AlertDialogAction onClick={remove} disabled={busy}>
+                      Delete
+                    </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>

@@ -9,7 +9,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { MessageBubble } from "@/components/message-bubble";
 import { useOnline } from "@/hooks/use-online";
 import { fetchMessages, fetchSession, setSessionStatus, type JournalMessage } from "@/lib/journal";
-import { finishJournalSession, retryJournalReply, sendJournalMessage } from "@/lib/companion.functions";
+import {
+  finishJournalSession,
+  retryJournalReply,
+  sendJournalMessage,
+} from "@/lib/companion.functions";
 
 export const Route = createFileRoute("/_authenticated/write/$sessionId")({
   head: () => ({
@@ -54,8 +58,14 @@ function WriteSession() {
   const [finishing, setFinishing] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  const session = useQuery({ queryKey: ["session", sessionId], queryFn: () => fetchSession(sessionId) });
-  const messages = useQuery({ queryKey: ["messages", sessionId], queryFn: () => fetchMessages(sessionId) });
+  const session = useQuery({
+    queryKey: ["session", sessionId],
+    queryFn: () => fetchSession(sessionId),
+  });
+  const messages = useQuery({
+    queryKey: ["messages", sessionId],
+    queryFn: () => fetchMessages(sessionId),
+  });
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -130,8 +140,14 @@ function WriteSession() {
       const res = await finishFn({ data: { sessionId } });
       if (!res.ok) throw new Error(res.error);
       qc.invalidateQueries();
-      if (res.analysisDeferred) toast.message("Entry saved. You've made a lot of summaries recently — create this one from the entry page in a little while.");
-      else if (!res.analysisOk) toast.message("Entry saved. The reflection summary couldn't be created — you can retry on the entry page.");
+      if (res.analysisDeferred)
+        toast.message(
+          "Entry saved. You've made a lot of summaries recently — create this one from the entry page in a little while.",
+        );
+      else if (!res.analysisOk)
+        toast.message(
+          "Entry saved. The reflection summary couldn't be created — you can retry on the entry page.",
+        );
       navigate({ to: "/entries/$entryId", params: { entryId: res.entryId } });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Couldn't finish. Try again.");
@@ -152,8 +168,18 @@ function WriteSession() {
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background px-6 text-center">
         <p className="font-serif text-xl">We couldn't open this reflection.</p>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => { session.refetch(); messages.refetch(); }}>Try again</Button>
-          <Button asChild><Link to="/journal">Back to journal</Link></Button>
+          <Button
+            variant="outline"
+            onClick={() => {
+              session.refetch();
+              messages.refetch();
+            }}
+          >
+            Try again
+          </Button>
+          <Button asChild>
+            <Link to="/journal">Back to journal</Link>
+          </Button>
         </div>
       </div>
     );
@@ -166,33 +192,47 @@ function WriteSession() {
     <div className="flex h-[100dvh] flex-col bg-background">
       <header className="flex items-center gap-2 border-b border-border px-3 py-3 sm:px-6">
         <Button variant="ghost" size="icon" asChild aria-label="Back to journal">
-          <Link to="/journal"><ArrowLeft className="size-5" /></Link>
+          <Link to="/journal">
+            <ArrowLeft className="size-5" />
+          </Link>
         </Button>
         <div className="min-w-0 flex-1">
           <p className="font-serif text-lg leading-tight">Reflection</p>
-          <p className="text-xs text-muted-foreground">{paused ? "Paused — your words are saved" : "Saved as you write"}</p>
+          <p className="text-xs text-muted-foreground">
+            {paused ? "Paused — your words are saved" : "Saved as you write"}
+          </p>
         </div>
         {!completed && (
           <>
-            <Button variant="ghost" size="sm" onClick={togglePause} aria-label={paused ? "Resume" : "Pause"}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={togglePause}
+              aria-label={paused ? "Resume" : "Pause"}
+            >
               {paused ? <Play className="size-4" /> : <Pause className="size-4" />}
               <span className="hidden sm:inline">{paused ? "Resume" : "Pause"}</span>
             </Button>
             <Button size="sm" onClick={finish} disabled={!hasUser || finishing || sending}>
-              {finishing ? <Loader2 className="size-4 animate-spin" /> : <Check className="size-4" />}
+              {finishing ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Check className="size-4" />
+              )}
               Finish
             </Button>
           </>
         )}
       </header>
 
-
       <div className="flex-1 overflow-y-auto">
         <ol className="mx-auto flex max-w-2xl flex-col gap-4 px-4 py-6 sm:px-6" aria-live="polite">
           {list.length === 0 && (
             <li className="py-16 text-center">
               <p className="font-serif text-2xl">What's on your mind?</p>
-              <p className="mt-2 text-sm text-muted-foreground">Start anywhere. A sentence is enough.</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Start anywhere. A sentence is enough.
+              </p>
             </li>
           )}
           {list.map((m) => (
@@ -210,14 +250,20 @@ function WriteSession() {
           )}
           {finishing && (
             <li className="text-center text-sm text-muted-foreground" role="status">
-              <Loader2 className="mr-2 inline size-4 animate-spin" />Saving and reflecting on your entry…
+              <Loader2 className="mr-2 inline size-4 animate-spin" />
+              Saving and reflecting on your entry…
             </li>
           )}
           {replyError && !sending && (
-            <li className="rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm" role="alert">
+            <li
+              className="rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm"
+              role="alert"
+            >
               <p>{replyError}</p>
               {list[list.length - 1]?.role === "user" && (
-                <Button size="sm" variant="outline" className="mt-2" onClick={retry}>Ask again</Button>
+                <Button size="sm" variant="outline" className="mt-2" onClick={retry}>
+                  Ask again
+                </Button>
               )}
             </li>
           )}
@@ -232,7 +278,10 @@ function WriteSession() {
       ) : (
         <form
           className="border-t border-border bg-card/80 px-3 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-6"
-          onSubmit={(e) => { e.preventDefault(); send(); }}
+          onSubmit={(e) => {
+            e.preventDefault();
+            send();
+          }}
         >
           {!online && (
             <p role="status" className="mx-auto mb-2 max-w-2xl text-xs text-muted-foreground">
@@ -241,19 +290,33 @@ function WriteSession() {
           )}
           <div className="mx-auto flex max-w-2xl items-end gap-2">
             <Button type="button" variant="ghost" size="icon" asChild>
-              <Link to="/voice" aria-label="Start a voice reflection instead"><Mic className="size-5" /></Link>
+              <Link to="/voice" aria-label="Start a voice reflection instead">
+                <Mic className="size-5" />
+              </Link>
             </Button>
             <Textarea
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
-              placeholder={paused ? "Paused — resume to keep writing" : "Write what's on your mind…"}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  send();
+                }
+              }}
+              placeholder={
+                paused ? "Paused — resume to keep writing" : "Write what's on your mind…"
+              }
               disabled={paused || sending || finishing}
               rows={1}
               className="max-h-40 min-h-11 resize-none bg-background"
               aria-label="Your message"
             />
-            <Button type="submit" size="icon" disabled={!draft.trim() || paused || sending || !online} aria-label="Send">
+            <Button
+              type="submit"
+              size="icon"
+              disabled={!draft.trim() || paused || sending || !online}
+              aria-label="Send"
+            >
               <Send className="size-4" />
             </Button>
           </div>

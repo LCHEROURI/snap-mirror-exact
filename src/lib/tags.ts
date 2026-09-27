@@ -1,11 +1,16 @@
 // Deterministic helpers shared by server tagging and tests (no AI).
 
 const PREFIX = /^(my|our|the)\s+/i;
-const ROLE = /^(friend|best friend|colleague|coworker|co-worker|boss|manager|neighbou?r|partner|cousin)\s+(?=[A-Z])/;
+const ROLE =
+  /^(friend|best friend|colleague|coworker|co-worker|boss|manager|neighbou?r|partner|cousin)\s+(?=[A-Z])/;
 
 /** Conservative display name: "my friend Mike" -> "Mike". Never merges different names (Mike vs Michael). */
 export function cleanPersonName(raw: string) {
-  let s = raw.replace(/\s+/g, " ").trim().replace(/\s*\([^)]*\)\s*$/, "").replace(/[.,;:!?]+$/, "");
+  let s = raw
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\s*\([^)]*\)\s*$/, "")
+    .replace(/[.,;:!?]+$/, "");
   s = s.replace(PREFIX, "");
   s = s.replace(ROLE, "");
   return s.slice(0, 60);

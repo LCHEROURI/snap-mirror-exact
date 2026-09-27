@@ -5,7 +5,11 @@ import { ChoiceGroup, Section, useSaveProfile } from "@/components/settings-ui";
 import { profileQueryOptions } from "@/lib/profile";
 
 export const Route = createFileRoute("/_authenticated/settings/reflection")({
-  head: () => meta("Reflection preferences", "Choose how you like to reflect and how your companion responds."),
+  head: () =>
+    meta(
+      "Reflection preferences",
+      "Choose how you like to reflect and how your companion responds.",
+    ),
   component: ReflectionSettings,
 });
 
@@ -27,7 +31,10 @@ function ReflectionSettings() {
   if (q.isLoading) return <Loading />;
   if (q.isError || !q.data) return <LoadError onRetry={() => q.refetch()} />;
   return (
-    <Section title="Reflection preferences" description="Changes apply to future replies. Past entries stay exactly as they are.">
+    <Section
+      title="Reflection preferences"
+      description="Changes apply to future replies. Past entries stay exactly as they are."
+    >
       <ChoiceGroup
         label="I prefer to reflect by"
         value={(q.data.preferred_interaction ?? "both") as "voice" | "writing" | "both"}
@@ -36,7 +43,9 @@ function ReflectionSettings() {
       />
       <ChoiceGroup
         label="Reflection style"
-        value={(q.data.reflection_style ?? "curious") as "gentle" | "curious" | "direct" | "practical"}
+        value={
+          (q.data.reflection_style ?? "curious") as "gentle" | "curious" | "direct" | "practical"
+        }
         options={[...STYLE]}
         onChange={(v) => save.mutate({ reflection_style: v })}
       />

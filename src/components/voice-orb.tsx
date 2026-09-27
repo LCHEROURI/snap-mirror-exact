@@ -27,12 +27,21 @@ export function VoiceOrb({ state, muted }: { state: VoiceState; muted: boolean }
           state === "thinking" && "animate-pulse motion-reduce:animate-none",
         )}
       >
-        {live && <span className="absolute inset-0 animate-ping rounded-full bg-primary/10 motion-reduce:hidden" />}
-        <div className={cn("grid size-28 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg sm:size-36", state === "paused" && "opacity-60")}>
+        {live && (
+          <span className="absolute inset-0 animate-ping rounded-full bg-primary/10 motion-reduce:hidden" />
+        )}
+        <div
+          className={cn(
+            "grid size-28 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg sm:size-36",
+            state === "paused" && "opacity-60",
+          )}
+        >
           {muted ? <MicOff className="size-10" /> : <Mic className="size-10" />}
         </div>
       </div>
-      <p role="status" aria-live="polite" className="font-serif text-xl">{muted && state !== "ended" ? "Muted" : STATE_LABEL[state]}</p>
+      <p role="status" aria-live="polite" className="font-serif text-xl">
+        {muted && state !== "ended" ? "Muted" : STATE_LABEL[state]}
+      </p>
     </div>
   );
 }

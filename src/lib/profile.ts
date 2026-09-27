@@ -19,7 +19,8 @@ export type Profile = {
   theme: string;
 };
 
-const PROFILE_COLS = "id, display_name, first_name, journaling_intention, reminder_preference, ai_memory_enabled, onboarded_at, reflection_style, preferred_interaction, timezone, voice_enabled, voice_name, auto_play_responses, weekly_report_enabled, reflection_reminders_enabled, theme";
+const PROFILE_COLS =
+  "id, display_name, first_name, journaling_intention, reminder_preference, ai_memory_enabled, onboarded_at, reflection_style, preferred_interaction, timezone, voice_enabled, voice_name, auto_play_responses, weekly_report_enabled, reflection_reminders_enabled, theme";
 
 /** Reads the signed-in user's profile, creating the row on first visit. */
 export async function fetchOrCreateProfile(): Promise<Profile | null> {
