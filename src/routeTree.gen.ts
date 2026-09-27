@@ -28,6 +28,7 @@ import { Route as AuthenticatedReportsIndexRouteImport } from './routes/_authent
 import { Route as AuthenticatedReportsWeekStartRouteImport } from './routes/_authenticated/reports.$weekStart'
 import { Route as AuthenticatedTopicsIndexRouteImport } from './routes/_authenticated/topics.index'
 import { Route as AuthenticatedTopicsTopicIdRouteImport } from './routes/_authenticated/topics.$topicId'
+import { Route as AuthenticatedVoiceIndexRouteImport } from './routes/_authenticated/voice.index'
 import { Route as AuthenticatedWriteSessionIdRouteImport } from './routes/_authenticated/write.$sessionId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -132,6 +133,11 @@ const AuthenticatedTopicsTopicIdRoute =
     path: '/topics/$topicId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedVoiceIndexRoute = AuthenticatedVoiceIndexRouteImport.update({
+  id: '/voice/',
+  path: '/voice/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedWriteSessionIdRoute =
   AuthenticatedWriteSessionIdRouteImport.update({
     id: '/write/$sessionId',
@@ -159,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/people/': typeof AuthenticatedPeopleIndexRoute
   '/reports/': typeof AuthenticatedReportsIndexRoute
   '/topics/': typeof AuthenticatedTopicsIndexRoute
+  '/voice/': typeof AuthenticatedVoiceIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -180,6 +187,7 @@ export interface FileRoutesByTo {
   '/people': typeof AuthenticatedPeopleIndexRoute
   '/reports': typeof AuthenticatedReportsIndexRoute
   '/topics': typeof AuthenticatedTopicsIndexRoute
+  '/voice': typeof AuthenticatedVoiceIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -203,6 +211,7 @@ export interface FileRoutesById {
   '/_authenticated/people/': typeof AuthenticatedPeopleIndexRoute
   '/_authenticated/reports/': typeof AuthenticatedReportsIndexRoute
   '/_authenticated/topics/': typeof AuthenticatedTopicsIndexRoute
+  '/_authenticated/voice/': typeof AuthenticatedVoiceIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -226,6 +235,7 @@ export interface FileRouteTypes {
     | '/people/'
     | '/reports/'
     | '/topics/'
+    | '/voice/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -247,6 +257,7 @@ export interface FileRouteTypes {
     | '/people'
     | '/reports'
     | '/topics'
+    | '/voice'
   id:
     | '__root__'
     | '/'
@@ -269,6 +280,7 @@ export interface FileRouteTypes {
     | '/_authenticated/people/'
     | '/_authenticated/reports/'
     | '/_authenticated/topics/'
+    | '/_authenticated/voice/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -412,6 +424,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTopicsTopicIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/voice/': {
+      id: '/_authenticated/voice/'
+      path: '/voice'
+      fullPath: '/voice/'
+      preLoaderRoute: typeof AuthenticatedVoiceIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/write/$sessionId': {
       id: '/_authenticated/write/$sessionId'
       path: '/write/$sessionId'
@@ -440,6 +459,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPeopleIndexRoute: typeof AuthenticatedPeopleIndexRoute
   AuthenticatedReportsIndexRoute: typeof AuthenticatedReportsIndexRoute
   AuthenticatedTopicsIndexRoute: typeof AuthenticatedTopicsIndexRoute
+  AuthenticatedVoiceIndexRoute: typeof AuthenticatedVoiceIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -460,6 +480,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPeopleIndexRoute: AuthenticatedPeopleIndexRoute,
   AuthenticatedReportsIndexRoute: AuthenticatedReportsIndexRoute,
   AuthenticatedTopicsIndexRoute: AuthenticatedTopicsIndexRoute,
+  AuthenticatedVoiceIndexRoute: AuthenticatedVoiceIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

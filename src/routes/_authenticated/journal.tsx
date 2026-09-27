@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Loader2, PenLine } from "lucide-react";
+import { Loader2, PenLine, Mic } from "lucide-react";
 import { AppShell, PageHeader } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { profileQueryOptions } from "@/lib/profile";
@@ -71,7 +71,10 @@ function JournalHome() {
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <Button className="w-full sm:w-auto" onClick={start} disabled={starting}>
               {starting ? <Loader2 className="size-4 animate-spin" /> : <PenLine className="size-4" />}
-              Start new reflection
+              Write
+            </Button>
+            <Button variant="outline" className="w-full sm:w-auto" asChild>
+              <Link to="/voice"><Mic className="size-4" /> Talk</Link>
             </Button>
             {active && (
               <Button variant="outline" asChild className="w-full sm:w-auto">
