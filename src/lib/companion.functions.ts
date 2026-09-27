@@ -1,52 +1,56 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { placeholderCompanion } from "./companion/placeholder";
-import type { CompanionTurn } from "./companion/types";
+import { JournalError, analyzeEntry, finishSession, retryReply, sendMessage } from "./ai/journal-ai.server";
 
-const RECENT_LIMIT = 12;
+// Errors are returned as values so the UI always gets a safe, readable message.
+type Fail = { ok: false; code: string; error: string };
+function fail(e: unknown): Fail {
+  if (e instanceof JournalError) return { ok: false, code: e.code, error: e.message };
+  console.error("[journal] unexpected", (e as Error)?.name);
+  return { ok: false, code: "unknown", error: "Something went wrong. Please try again." };
+}
 
-/**
- * Generates and stores the companion's reply for a session.
- * Ownership comes from the authenticated session (RLS), never from the browser.
- */
-export const requestCompanionReply = createServerFn({ method: "POST" })
+export const sendJournalMessage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data) => z.object({ sessionId: z.string().uuid() }).parse(data))
+  .inputValidator((d) => z.object({ sessionId: z.string().uuid(), message: z.string().min(1).max(8000) }).parse(d))
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
+    try {
+      return { ok: true as const, ...(await sendMessage(context.supabase, context.userId, data.sessionId, data.message)) };
+    } catch (e) {
+      return fail(e);
+    }
+  });
 
-    const { data: session, error: sErr } = await supabase
-      .from("journal_sessions")
-      .select("id, status")
-      .eq("id", data.sessionId)
-      .maybeSingle();
-    if (sErr) throw new Error(sErr.message);
-    if (!session) throw new Error("Session not found");
-    if (session.status === "completed") throw new Error("This reflection is already finished");
+export const retryJournalReply = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ sessionId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    try {
+      return { ok: true as const, ...(await retryReply(context.supabase, context.userId, data.sessionId)) };
+    } catch (e) {
+      return fail(e);
+    }
+  });
 
-    const { data: rows, error: mErr } = await supabase
-      .from("journal_messages")
-      .select("role, content")
-      .eq("session_id", data.sessionId)
-      .order("created_at", { ascending: false })
-      .limit(RECENT_LIMIT);
-    if (mErr) throw new Error(mErr.message);
+export const finishJournalSession = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ sessionId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    try {
+      return { ok: true as const, ...(await finishSession(context.supabase, context.userId, data.sessionId)) };
+    } catch (e) {
+      return fail(e);
+    }
+  });
 
-    const recent: CompanionTurn[] = (rows ?? [])
-      .reverse()
-      .filter((r) => r.role === "user" || r.role === "assistant")
-      .map((r) => ({ role: r.role as CompanionTurn["role"], content: r.content }));
-
-    // Phase 3: swap placeholderCompanion for the real AI provider.
-    const reply = await placeholderCompanion.reply(recent);
-
-    const { data: inserted, error: iErr } = await supabase
-      .from("journal_messages")
-      .insert({ session_id: data.sessionId, user_id: userId, role: "assistant", content: reply.content })
-      .select("id, role, content, created_at")
-      .single();
-    if (iErr) throw new Error(iErr.message);
-
-    return { message: inserted, provider: reply.provider };
+export const retryEntryAnalysis = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ entryId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    try {
+      return { ok: true as const, ...(await analyzeEntry(context.supabase, data.entryId)) };
+    } catch (e) {
+      return fail(e);
+    }
   });
