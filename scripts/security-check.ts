@@ -80,6 +80,23 @@ try {
   ok((await count()) === before && before > 0, "A cannot delete own usage rows");
   const after = (await A.c.rpc("consume_ai_quota", { p_kind: "weekly", p_limit: 3, p_window_seconds: 60 })).data;
   ok(after === false, "quota still blocks after delete attempt");
+  // Supplying a larger limit or shorter window directly never unlocks the server's own check
+  await A.c.rpc("consume_ai_quota", { p_kind: "weekly", p_limit: 1000, p_window_seconds: 60 });
+  await A.c.rpc("consume_ai_quota", { p_kind: "weekly", p_limit: 3, p_window_seconds: 1 });
+  const real = (await A.c.rpc("consume_ai_quota", { p_kind: "weekly", p_limit: 3, p_window_seconds: 60 })).data;
+  ok(real === false, "larger p_limit / shorter window calls don't bypass the server's limit");
+  const shortWin = await A.c.rpc("consume_ai_quota", { p_kind: "weekly", p_limit: 3, p_window_seconds: 0 });
+  ok(!!shortWin.error, "quota rejects a zero-second window");
+  // Cross-user usage: A cannot read or delete B's rows
+  const bCount = async () => (await admin.from("ai_usage").select("id", { count: "exact", head: true }).eq("user_id", B.id)).count ?? 0;
+  const bBefore = await bCount();
+  const aSeesB = await A.c.from("ai_usage").select("id").eq("user_id", B.id);
+  ok((aSeesB.data ?? []).length === 0, "A cannot read B's usage");
+  await A.c.from("ai_usage").delete().eq("user_id", B.id);
+  await A.c.from("ai_usage").update({ kind: "chat" }).eq("user_id", B.id);
+  ok(bBefore > 0 && (await bCount()) === bBefore, "A cannot delete or modify B's usage");
+  const direct = await A.c.rpc("clear_my_ai_usage");
+  ok(!!direct.error, "clear_my_ai_usage refuses when called on its own");
   const ins = await A.c.from("ai_usage").insert({ kind: "chat", user_id: A.id });
   ok(!!ins.error, "A cannot insert own usage rows directly");
   const big = await A.c.rpc("consume_ai_quota", { p_kind: "chat", p_limit: 100000, p_window_seconds: 60 });
