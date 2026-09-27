@@ -71,7 +71,7 @@ export function EntryAnalysis({
       <section className="mt-8 rounded-2xl border border-dashed border-border px-5 py-6">
         <p className="font-serif text-lg">{status === "failed" ? "The reflection summary wasn't created" : "No reflection summary yet"}</p>
         <p className="mt-1 text-sm text-muted-foreground">
-          {msg ?? error ?? "Your transcript is saved safely."} Your transcript is untouched.
+          {msg ?? error ?? (status === "pending" ? "Your entry is saved. Tap below to create its summary." : "Your transcript is saved safely.")} Your transcript is untouched.
         </p>
         <Button className="mt-4" variant="outline" onClick={run} disabled={busy}>
           {busy ? <Loader2 className="size-4 animate-spin" /> : <RefreshCw className="size-4" />}

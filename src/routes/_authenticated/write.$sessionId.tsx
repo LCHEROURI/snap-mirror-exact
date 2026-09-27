@@ -130,7 +130,8 @@ function WriteSession() {
       const res = await finishFn({ data: { sessionId } });
       if (!res.ok) throw new Error(res.error);
       qc.invalidateQueries();
-      if (!res.analysisOk) toast.message("Entry saved. The reflection summary couldn't be created — you can retry on the entry page.");
+      if (res.analysisDeferred) toast.message("Entry saved. You've made a lot of summaries recently — create this one from the entry page in a little while.");
+      else if (!res.analysisOk) toast.message("Entry saved. The reflection summary couldn't be created — you can retry on the entry page.");
       navigate({ to: "/entries/$entryId", params: { entryId: res.entryId } });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Couldn't finish. Try again.");
