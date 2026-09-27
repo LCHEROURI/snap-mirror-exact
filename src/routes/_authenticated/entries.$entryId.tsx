@@ -11,7 +11,7 @@ import {
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { deleteEntry, fetchEntry, fetchMessages, formatDate, renameEntry } from "@/lib/journal";
-import { MessageBubble } from "./write.$sessionId";
+import { MessageBubble } from "@/components/message-bubble";
 
 export const Route = createFileRoute("/_authenticated/entries/$entryId")({
   head: () => ({
