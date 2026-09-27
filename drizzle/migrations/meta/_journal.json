@@ -71,6 +71,13 @@
       "when": 1790523071465,
       "tag": "0009_phase10_ai_rate_limit",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1790523140805,
+      "tag": "0010_phase10_delete_usage",
+      "breakpoints": true
     }
   ]
 }
