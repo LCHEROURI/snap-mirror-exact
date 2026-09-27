@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { RATE_LIMITED, allowAi } from "./ai/rate-limit.server";
 import { WEEK_RE } from "./weekly";
 import { WeeklyError, generateWeeklyReport } from "./ai/weekly.server";
 
@@ -16,6 +17,7 @@ export const generateWeekly = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     try {
+      if (!(await allowAi(context.supabase, "weekly"))) return RATE_LIMITED;
       const r = await generateWeeklyReport(context.supabase, context.userId, { weekStart: data.week_start, regenerate: data.regenerate, timezone: data.timezone });
       return { ok: true as const, status: r.status, id: r.report.id, week_start: r.report.week_start };
     } catch (e) {

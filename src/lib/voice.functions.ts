@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { RATE_LIMITED, allowAi } from "./ai/rate-limit.server";
 import { JournalError, sendMessage } from "./ai/journal-ai.server";
 import { availableModes, createRealtimeSecret, ownedVoiceSession, saveRealtimeTurn, speakMessage, transcribe } from "./ai/voice.server";
 
@@ -31,6 +32,7 @@ export const realtimeSession = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ sessionId: sid }).parse(d))
   .handler(async ({ data, context }) => {
     try {
+      if (!(await allowAi(context.supabase, "realtime"))) return RATE_LIMITED;
       return { ok: true as const, ...(await createRealtimeSecret(context.supabase, context.userId, data.sessionId)) };
     } catch (e) {
       return fail(e);
@@ -60,6 +62,7 @@ export const voiceTurn = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     try {
+      if (!(await allowAi(context.supabase, "voice"))) return RATE_LIMITED;
       await ownedVoiceSession(context.supabase, context.userId, data.sessionId);
       const text = await transcribe(data.audio);
       const r = await sendMessage(context.supabase, context.userId, data.sessionId, text);
@@ -74,6 +77,7 @@ export const voiceSpeak = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ messageId: sid }).parse(d))
   .handler(async ({ data, context }) => {
     try {
+      if (!(await allowAi(context.supabase, "speak"))) return RATE_LIMITED;
       return { ok: true as const, ...(await speakMessage(context.supabase, data.messageId)) };
     } catch (e) {
       return fail(e);
