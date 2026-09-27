@@ -38,7 +38,7 @@ function PrivacySettings() {
       if (!r.ok) { toast.error(r.error); setStatus(r.error); return; }
       // Zipped in the browser: nothing is stored on a server or behind a link.
       const zip = zipSync({
-        "reflective-export/data.json": strToU8(JSON.stringify(r.json, null, 2)),
+        "reflective-export/data.json": strToU8(r.jsonText),
         "reflective-export/journal.md": strToU8(r.markdown),
         "reflective-export/README.txt": strToU8(README),
       });

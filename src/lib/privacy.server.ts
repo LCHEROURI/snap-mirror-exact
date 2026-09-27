@@ -55,7 +55,7 @@ export async function buildExport(db: Db, userId: string, email: string | undefi
     preferences: { voice_enabled, voice_name, auto_play_responses, weekly_report_enabled, reflection_reminders_enabled, theme, reminder_preference },
     ...data,
   };
-  return { json, markdown: toMarkdown(data) };
+  return { jsonText: JSON.stringify(json, null, 2), markdown: toMarkdown(data) };
 }
 
 function toMarkdown(d: Record<Table, Record<string, unknown>[]>) {
