@@ -56,6 +56,7 @@ export async function generateReply(system: string, messages: ModelMessage[], mo
       system,
       messages,
       providerOptions: openaiOptions("low"),
+      onError: () => {}, // suppress SDK default logging, which can include private journal text
     });
     const text = (await result.text).trim();
     if (!text) throw new AiError("provider", "The companion couldn't respond just now. Please try again.");
@@ -75,6 +76,7 @@ export async function generateObject<T>(system: string, prompt: string, schema: 
       prompt,
       output: Output.object({ schema }),
       providerOptions: openaiOptions("low"),
+      onError: () => {}, // suppress SDK default logging, which can include private journal text
     });
     return (await result.output) as T;
   } catch (e) {

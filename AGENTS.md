@@ -17,7 +17,8 @@
 - Signed-in screens live under `src/routes/_authenticated/`; the pathless layout owns the auth gate so child routes carry no auth code.
 - Journal context sent to a model is always last-N messages + top-k retrieved memories, never full history — keeps cost and privacy bounded.
 - Every user-owned table carries `user_id`, RLS scoped to `auth.uid()`, and explicit GRANTs; `memories.embedding` is pgvector for semantic retrieval.
-- Companion replies go through `requestCompanionReply` (src/lib/companion.functions.ts) behind the `ReflectionCompanion` interface, so Phase 3 swaps the provider without touching UI.
+- AI lives in `src/lib/ai/*.server.ts` (config, gateway, prompts, safety, journal-ai) and is exposed only via `src/lib/companion.functions.ts`; server functions stand in for the spec's Edge Functions (journal-chat, finish-journal-session). Model ids come from `JOURNAL_CHAT_MODEL`/`JOURNAL_ANALYSIS_MODEL` env with defaults in config.server.ts.
+- Finishing always saves the entry before analysis; analysis output is validated by `validateAnalysis` and failures set `analysis_status='failed'` with a retry path, never touching the transcript.
 - Journal data access lives in `src/lib/journal.ts` using the browser client; `user_id` defaults to `auth.uid()` and insert policies verify session ownership, so the browser can't claim another owner.
 - Shared signed-in chrome lives in `src/components/app-shell.tsx` (bottom tabs on mobile, side rail on desktop).
 
