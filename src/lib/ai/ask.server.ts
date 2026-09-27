@@ -4,6 +4,7 @@ import type { Database } from "@/integrations/supabase/types";
 import { aiConfig } from "./config.server";
 import { AiError, generateObject } from "./gateway.server";
 import { embedTexts, memoryEnabled } from "./memory.server";
+import { parseRange } from "../ask-range";
 
 type Db = SupabaseClient<Database>;
 
@@ -38,41 +39,7 @@ async function backfillEntries(db: Db) {
   for (const e of data ?? []) await embedEntrySummary(db, e.id, `${e.title}. ${e.summary ?? ""}`);
 }
 
-/** Server-side date-range interpretation (UTC). Returns undefined for no range. */
-export function parseRange(q: string, now = new Date()): { from: Date; to: Date; label: string } | undefined {
-  const s = q.toLowerCase();
-  const day = 86_400_000;
-  const startOfDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-  const tomorrow = new Date(startOfDay.getTime() + day);
-  const m = s.match(/(?:past|last)\s+(\d{1,3})\s+days?/);
-  if (m) return { from: new Date(tomorrow.getTime() - Number(m[1]) * day), to: tomorrow, label: `past ${m[1]} days` };
-  if (/\btoday\b/.test(s)) return { from: startOfDay, to: tomorrow, label: "today" };
-  if (/\bthis week\b/.test(s)) {
-    const dow = (startOfDay.getUTCDay() + 6) % 7;
-    return { from: new Date(startOfDay.getTime() - dow * day), to: tomorrow, label: "this week" };
-  }
-  if (/\blast week\b/.test(s)) {
-    const dow = (startOfDay.getUTCDay() + 6) % 7;
-    const thisMon = startOfDay.getTime() - dow * day;
-    return { from: new Date(thisMon - 7 * day), to: new Date(thisMon), label: "last week" };
-  }
-  if (/\bthis month\b/.test(s))
-    return { from: new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)), to: tomorrow, label: "this month" };
-  if (/\blast month\b/.test(s))
-    return {
-      from: new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 1)),
-      to: new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)),
-      label: "last month",
-    };
-  if (/\b(recently|lately)\b/.test(s)) return { from: new Date(tomorrow.getTime() - 30 * day), to: tomorrow, label: "the past 30 days" };
-  const months = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
-  const mi = months.findIndex((mn) => new RegExp(`\\b(in|during)\\s+${mn}\\b`).test(s));
-  if (mi >= 0) {
-    const y = mi > now.getUTCMonth() ? now.getUTCFullYear() - 1 : now.getUTCFullYear();
-    return { from: new Date(Date.UTC(y, mi, 1)), to: new Date(Date.UTC(y, mi + 1, 1)), label: months[mi]! };
-  }
-  return undefined;
-}
+// Date ranges are interpreted in the user's stored timezone (src/lib/ask-range.ts).
 
 const wire = z.object({
   answer: z.string(),
@@ -109,7 +76,8 @@ export async function askJournal(db: Db, userId: string, question: string): Prom
   const { count: total } = await db.from("journal_entries").select("id", { count: "exact", head: true });
   if (!total) throw new AskError("no_history", "Your journal needs a little history before you can ask questions across it.");
 
-  const range = parseRange(q);
+  const { data: prof } = await db.from("profiles").select("timezone").eq("id", userId).maybeSingle();
+  const range = parseRange(q, prof?.timezone);
   await backfillEntries(db).catch(() => undefined);
 
   let qv: number[];

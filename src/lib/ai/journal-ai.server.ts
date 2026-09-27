@@ -169,8 +169,16 @@ function deterministicMeta(rows: { role: string; content: string }[]) {
   };
 }
 
-/** Finishes the session: entry is always saved first, then analysis runs. Analysis failure never loses the entry. */
-export async function finishSession(db: Db, userId: string, sessionId: string) {
+/**
+ * Finishes the session: entry is always saved first, then analysis runs only if the
+ * analysis quota allows it. Quota or analysis failure never loses the entry.
+ */
+export async function finishSession(
+  db: Db,
+  userId: string,
+  sessionId: string,
+  canAnalyze: () => Promise<boolean> = async () => true,
+) {
   const session = await ownedSession(db, sessionId);
   const rows = await allMessages(db, sessionId);
   if (!rows.some((m) => m.role === "user")) throw new JournalError("invalid", "Write something before finishing.");
@@ -199,8 +207,10 @@ export async function finishSession(db: Db, userId: string, sessionId: string) {
     const { error } = await db.from("journal_sessions").update({ status: "completed", ended_at: now }).eq("id", sessionId);
     if (error) throw new JournalError("db", "Couldn't finish the reflection.");
   }
-  const analysis = existing?.analysis_status === "complete" ? { ok: true } : await analyzeEntry(db, entryId);
-  return { entryId, analysisOk: analysis.ok };
+  if (existing?.analysis_status === "complete") return { entryId, analysisOk: true, analysisDeferred: false };
+  if (!(await canAnalyze())) return { entryId, analysisOk: false, analysisDeferred: true };
+  const analysis = await analyzeEntry(db, entryId);
+  return { entryId, analysisOk: analysis.ok, analysisDeferred: false };
 }
 
 export async function analyzeEntry(db: Db, entryId: string): Promise<{ ok: boolean }> {

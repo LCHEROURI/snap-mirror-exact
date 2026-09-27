@@ -41,8 +41,11 @@ export const finishJournalSession = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ sessionId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     try {
-      // Never rate-limited: finishing must always save the entry.
-      return { ok: true as const, ...(await finishSession(context.supabase, context.userId, data.sessionId)) };
+      // Saving is never limited; only the AI analysis step obeys the analysis quota.
+      return {
+        ok: true as const,
+        ...(await finishSession(context.supabase, context.userId, data.sessionId, () => allowAi(context.supabase, "analysis"))),
+      };
     } catch (e) {
       return fail(e);
     }

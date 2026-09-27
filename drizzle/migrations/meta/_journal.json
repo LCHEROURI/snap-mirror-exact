@@ -78,6 +78,13 @@
       "when": 1790523140805,
       "tag": "0010_phase10_delete_usage",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1790533927330,
+      "tag": "0011_lock_ai_usage",
+      "breakpoints": true
     }
   ]
 }
