@@ -180,7 +180,7 @@ export class RealtimeVoiceProvider implements VoiceProvider {
   }
   pause() {
     this.stream?.getAudioTracks().forEach((t) => (t.enabled = false));
-    this.dc?.readyState === "open" && this.dc.send(JSON.stringify({ type: "response.cancel" }));
+    if (this.dc?.readyState === "open") this.dc.send(JSON.stringify({ type: "response.cancel" }));
     if (this.audio) this.audio.muted = true;
     if (this.idle) clearTimeout(this.idle);
     this.ev.onState("paused");

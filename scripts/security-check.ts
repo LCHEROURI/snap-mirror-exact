@@ -12,7 +12,8 @@ const admin = createClient(URL, SRK, { auth: { persistSession: false } });
 let pass = 0,
   failN = 0;
 const ok = (c: boolean, m: string) => {
-  c ? pass++ : failN++;
+  if (c) pass++;
+  else failN++;
   console.log(c ? "PASS" : "FAIL", m);
 };
 async function user(tag: string) {
