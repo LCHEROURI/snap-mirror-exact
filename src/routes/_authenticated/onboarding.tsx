@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import type { TablesUpdate } from "@/integrations/supabase/types";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
   head: () => ({
@@ -67,7 +68,7 @@ function Onboarding() {
     trackEvent("onboarding_started");
   }, [profile]);
 
-  async function updateProfile(fields: Record<string, string | null>) {
+  async function updateProfile(fields: TablesUpdate<"profiles">) {
     const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) throw new Error("Not signed in");
     const { error } = await supabase.from("profiles").update(fields).eq("id", userData.user.id);
