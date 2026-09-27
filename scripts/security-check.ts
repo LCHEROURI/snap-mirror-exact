@@ -71,14 +71,14 @@ try {
   ok(!!q.error, "signed-out cannot use AI quota");
   // Rate limit behaviour
   let last = true;
-  for (let i = 0; i < 4; i++) last = (await A.c.rpc("consume_ai_quota", { p_kind: "t", p_limit: 3, p_window_seconds: 60 })).data as boolean;
+  for (let i = 0; i < 4; i++) last = (await A.c.rpc("consume_ai_quota", { p_kind: "weekly", p_limit: 3, p_window_seconds: 60 })).data as boolean;
   ok(last === false, "quota blocks the 4th call when limit is 3");
   // Bypass attempts: user must not be able to clear or forge their own usage rows
   const count = async () => (await admin.from("ai_usage").select("id", { count: "exact", head: true }).eq("user_id", A.id)).count ?? 0;
   const before = await count();
   await A.c.from("ai_usage").delete().eq("user_id", A.id);
   ok((await count()) === before && before > 0, "A cannot delete own usage rows");
-  const after = (await A.c.rpc("consume_ai_quota", { p_kind: "t", p_limit: 3, p_window_seconds: 60 })).data;
+  const after = (await A.c.rpc("consume_ai_quota", { p_kind: "weekly", p_limit: 3, p_window_seconds: 60 })).data;
   ok(after === false, "quota still blocks after delete attempt");
   const ins = await A.c.from("ai_usage").insert({ kind: "chat", user_id: A.id });
   ok(!!ins.error, "A cannot insert own usage rows directly");
