@@ -1,11 +1,12 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
-import { PenLine } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { Loader2, PenLine } from "lucide-react";
 import { AppShell, PageHeader } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { profileQueryOptions } from "@/lib/profile";
-import { supabase } from "@/integrations/supabase/client";
+import { createSession, fetchActiveSession, fetchEntries, formatDate } from "@/lib/journal";
 
 export const Route = createFileRoute("/_authenticated/journal")({
   head: () => ({
@@ -36,18 +37,20 @@ function JournalHome() {
     }
   }, [isLoading, profile, navigate]);
 
-  const { data: sessions } = useQuery({
-    queryKey: ["recent-sessions"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("journal_sessions")
-        .select("id, title, started_at, mood_score")
-        .order("started_at", { ascending: false })
-        .limit(5);
-      if (error) throw error;
-      return data;
-    },
-  });
+  const { data: sessions } = useQuery({ queryKey: ["entries", "recent"], queryFn: () => fetchEntries().then((r) => r.slice(0, 5)) });
+  const { data: active } = useQuery({ queryKey: ["active-session"], queryFn: fetchActiveSession });
+  const [starting, setStarting] = useState(false);
+
+  async function start() {
+    setStarting(true);
+    try {
+      const id = await createSession();
+      navigate({ to: "/write/$sessionId", params: { sessionId: id } });
+    } catch {
+      toast.error("Couldn't start a reflection. Try again.");
+      setStarting(false);
+    }
+  }
 
   const name = profile?.display_name?.split(" ")[0];
 
@@ -62,12 +65,19 @@ function JournalHome() {
         <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
           <h2 className="font-serif text-xl tracking-tight">Start a reflection</h2>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            Write freely about your day. Conversations with your companion arrive next.
+            Write freely about your day. Everything is saved privately as you go.
           </p>
-          <Button className="mt-5 w-full sm:w-auto" disabled>
-            <PenLine className="size-4" />
-            Coming in the next step
-          </Button>
+          <div className="mt-5 flex flex-col gap-2 sm:flex-row">
+            <Button className="w-full sm:w-auto" onClick={start} disabled={starting}>
+              {starting ? <Loader2 className="size-4 animate-spin" /> : <PenLine className="size-4" />}
+              Start new reflection
+            </Button>
+            {active && (
+              <Button variant="outline" asChild className="w-full sm:w-auto">
+                <Link to="/write/$sessionId" params={{ sessionId: active.id }}>Continue unfinished reflection</Link>
+              </Button>
+            )}
+          </div>
         </div>
 
         <section className="mt-10">
@@ -75,15 +85,11 @@ function JournalHome() {
           {sessions && sessions.length > 0 ? (
             <ul className="mt-4 divide-y divide-border rounded-2xl border border-border bg-card">
               {sessions.map((session) => (
-                <li key={session.id} className="px-5 py-4">
-                  <p className="text-sm text-foreground">{session.title ?? "Untitled reflection"}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {new Date(session.started_at).toLocaleDateString(undefined, {
-                      weekday: "long",
-                      day: "numeric",
-                      month: "long",
-                    })}
-                  </p>
+                <li key={session.id}>
+                  <Link to="/entries/$entryId" params={{ entryId: session.id }} className="block px-5 py-4 hover:bg-accent/40">
+                    <p className="text-sm text-foreground">{session.title}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">{formatDate(session.started_at)}</p>
+                  </Link>
                 </li>
               ))}
             </ul>
