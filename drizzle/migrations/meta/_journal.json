@@ -43,6 +43,13 @@
       "when": 1790519933129,
       "tag": "0005_phase6_goals_topics_people_mood",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1790520620145,
+      "tag": "0006_phase7_weekly_reports",
+      "breakpoints": true
     }
   ]
 }

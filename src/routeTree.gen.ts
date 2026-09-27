@@ -24,6 +24,8 @@ import { Route as AuthenticatedGoalsIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedGoalsGoalIdRouteImport } from './routes/_authenticated/goals.$goalId'
 import { Route as AuthenticatedPeopleIndexRouteImport } from './routes/_authenticated/people.index'
 import { Route as AuthenticatedPeoplePersonIdRouteImport } from './routes/_authenticated/people.$personId'
+import { Route as AuthenticatedReportsIndexRouteImport } from './routes/_authenticated/reports.index'
+import { Route as AuthenticatedReportsWeekStartRouteImport } from './routes/_authenticated/reports.$weekStart'
 import { Route as AuthenticatedTopicsIndexRouteImport } from './routes/_authenticated/topics.index'
 import { Route as AuthenticatedTopicsTopicIdRouteImport } from './routes/_authenticated/topics.$topicId'
 import { Route as AuthenticatedWriteSessionIdRouteImport } from './routes/_authenticated/write.$sessionId'
@@ -106,6 +108,18 @@ const AuthenticatedPeoplePersonIdRoute =
     path: '/people/$personId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedReportsIndexRoute =
+  AuthenticatedReportsIndexRouteImport.update({
+    id: '/reports/',
+    path: '/reports/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedReportsWeekStartRoute =
+  AuthenticatedReportsWeekStartRouteImport.update({
+    id: '/reports/$weekStart',
+    path: '/reports/$weekStart',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedTopicsIndexRoute =
   AuthenticatedTopicsIndexRouteImport.update({
     id: '/topics/',
@@ -138,10 +152,12 @@ export interface FileRoutesByFullPath {
   '/entries/$entryId': typeof AuthenticatedEntriesEntryIdRoute
   '/goals/$goalId': typeof AuthenticatedGoalsGoalIdRoute
   '/people/$personId': typeof AuthenticatedPeoplePersonIdRoute
+  '/reports/$weekStart': typeof AuthenticatedReportsWeekStartRoute
   '/topics/$topicId': typeof AuthenticatedTopicsTopicIdRoute
   '/write/$sessionId': typeof AuthenticatedWriteSessionIdRoute
   '/goals/': typeof AuthenticatedGoalsIndexRoute
   '/people/': typeof AuthenticatedPeopleIndexRoute
+  '/reports/': typeof AuthenticatedReportsIndexRoute
   '/topics/': typeof AuthenticatedTopicsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -157,10 +173,12 @@ export interface FileRoutesByTo {
   '/entries/$entryId': typeof AuthenticatedEntriesEntryIdRoute
   '/goals/$goalId': typeof AuthenticatedGoalsGoalIdRoute
   '/people/$personId': typeof AuthenticatedPeoplePersonIdRoute
+  '/reports/$weekStart': typeof AuthenticatedReportsWeekStartRoute
   '/topics/$topicId': typeof AuthenticatedTopicsTopicIdRoute
   '/write/$sessionId': typeof AuthenticatedWriteSessionIdRoute
   '/goals': typeof AuthenticatedGoalsIndexRoute
   '/people': typeof AuthenticatedPeopleIndexRoute
+  '/reports': typeof AuthenticatedReportsIndexRoute
   '/topics': typeof AuthenticatedTopicsIndexRoute
 }
 export interface FileRoutesById {
@@ -178,10 +196,12 @@ export interface FileRoutesById {
   '/_authenticated/entries/$entryId': typeof AuthenticatedEntriesEntryIdRoute
   '/_authenticated/goals/$goalId': typeof AuthenticatedGoalsGoalIdRoute
   '/_authenticated/people/$personId': typeof AuthenticatedPeoplePersonIdRoute
+  '/_authenticated/reports/$weekStart': typeof AuthenticatedReportsWeekStartRoute
   '/_authenticated/topics/$topicId': typeof AuthenticatedTopicsTopicIdRoute
   '/_authenticated/write/$sessionId': typeof AuthenticatedWriteSessionIdRoute
   '/_authenticated/goals/': typeof AuthenticatedGoalsIndexRoute
   '/_authenticated/people/': typeof AuthenticatedPeopleIndexRoute
+  '/_authenticated/reports/': typeof AuthenticatedReportsIndexRoute
   '/_authenticated/topics/': typeof AuthenticatedTopicsIndexRoute
 }
 export interface FileRouteTypes {
@@ -199,10 +219,12 @@ export interface FileRouteTypes {
     | '/entries/$entryId'
     | '/goals/$goalId'
     | '/people/$personId'
+    | '/reports/$weekStart'
     | '/topics/$topicId'
     | '/write/$sessionId'
     | '/goals/'
     | '/people/'
+    | '/reports/'
     | '/topics/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -218,10 +240,12 @@ export interface FileRouteTypes {
     | '/entries/$entryId'
     | '/goals/$goalId'
     | '/people/$personId'
+    | '/reports/$weekStart'
     | '/topics/$topicId'
     | '/write/$sessionId'
     | '/goals'
     | '/people'
+    | '/reports'
     | '/topics'
   id:
     | '__root__'
@@ -238,10 +262,12 @@ export interface FileRouteTypes {
     | '/_authenticated/entries/$entryId'
     | '/_authenticated/goals/$goalId'
     | '/_authenticated/people/$personId'
+    | '/_authenticated/reports/$weekStart'
     | '/_authenticated/topics/$topicId'
     | '/_authenticated/write/$sessionId'
     | '/_authenticated/goals/'
     | '/_authenticated/people/'
+    | '/_authenticated/reports/'
     | '/_authenticated/topics/'
   fileRoutesById: FileRoutesById
 }
@@ -358,6 +384,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPeoplePersonIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/reports/': {
+      id: '/_authenticated/reports/'
+      path: '/reports'
+      fullPath: '/reports/'
+      preLoaderRoute: typeof AuthenticatedReportsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/reports/$weekStart': {
+      id: '/_authenticated/reports/$weekStart'
+      path: '/reports/$weekStart'
+      fullPath: '/reports/$weekStart'
+      preLoaderRoute: typeof AuthenticatedReportsWeekStartRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/topics/': {
       id: '/_authenticated/topics/'
       path: '/topics'
@@ -393,10 +433,12 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedEntriesEntryIdRoute: typeof AuthenticatedEntriesEntryIdRoute
   AuthenticatedGoalsGoalIdRoute: typeof AuthenticatedGoalsGoalIdRoute
   AuthenticatedPeoplePersonIdRoute: typeof AuthenticatedPeoplePersonIdRoute
+  AuthenticatedReportsWeekStartRoute: typeof AuthenticatedReportsWeekStartRoute
   AuthenticatedTopicsTopicIdRoute: typeof AuthenticatedTopicsTopicIdRoute
   AuthenticatedWriteSessionIdRoute: typeof AuthenticatedWriteSessionIdRoute
   AuthenticatedGoalsIndexRoute: typeof AuthenticatedGoalsIndexRoute
   AuthenticatedPeopleIndexRoute: typeof AuthenticatedPeopleIndexRoute
+  AuthenticatedReportsIndexRoute: typeof AuthenticatedReportsIndexRoute
   AuthenticatedTopicsIndexRoute: typeof AuthenticatedTopicsIndexRoute
 }
 
@@ -411,10 +453,12 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedEntriesEntryIdRoute: AuthenticatedEntriesEntryIdRoute,
   AuthenticatedGoalsGoalIdRoute: AuthenticatedGoalsGoalIdRoute,
   AuthenticatedPeoplePersonIdRoute: AuthenticatedPeoplePersonIdRoute,
+  AuthenticatedReportsWeekStartRoute: AuthenticatedReportsWeekStartRoute,
   AuthenticatedTopicsTopicIdRoute: AuthenticatedTopicsTopicIdRoute,
   AuthenticatedWriteSessionIdRoute: AuthenticatedWriteSessionIdRoute,
   AuthenticatedGoalsIndexRoute: AuthenticatedGoalsIndexRoute,
   AuthenticatedPeopleIndexRoute: AuthenticatedPeopleIndexRoute,
+  AuthenticatedReportsIndexRoute: AuthenticatedReportsIndexRoute,
   AuthenticatedTopicsIndexRoute: AuthenticatedTopicsIndexRoute,
 }
 
