@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { profileQueryOptions } from "@/lib/profile";
+import { MemoryManager } from "@/components/memory-manager";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
@@ -106,7 +107,7 @@ function SettingsPage() {
               <Label htmlFor="memory">Let Reflective remember</Label>
               <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
                 Keeps a short set of notes about what matters to you, so conversations feel
-                continuous. You'll be able to view and delete them.
+                continuous. When off, nothing new is saved or recalled; existing memories stay until you delete them.
               </p>
             </div>
             <Switch id="memory" checked={memory} onCheckedChange={setMemory} />
@@ -116,6 +117,8 @@ function SettingsPage() {
             Save changes
           </Button>
         </section>
+
+        <MemoryManager enabled={profile?.ai_memory_enabled ?? true} />
 
         <section className="space-y-3 rounded-2xl border border-border bg-card p-5">
           <h2 className="font-serif text-lg tracking-tight">Privacy</h2>
