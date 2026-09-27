@@ -85,6 +85,62 @@ export type Database = {
         }
         Relationships: []
       }
+      journal_entries: {
+        Row: {
+          completed_at: string
+          created_at: string
+          id: string
+          message_count: number
+          mood_score: number | null
+          preview: string | null
+          session_id: string | null
+          session_type: string
+          started_at: string
+          title: string
+          updated_at: string
+          user_id: string
+          word_count: number
+        }
+        Insert: {
+          completed_at?: string
+          created_at?: string
+          id?: string
+          message_count?: number
+          mood_score?: number | null
+          preview?: string | null
+          session_id?: string | null
+          session_type?: string
+          started_at?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+          word_count?: number
+        }
+        Update: {
+          completed_at?: string
+          created_at?: string
+          id?: string
+          message_count?: number
+          mood_score?: number | null
+          preview?: string | null
+          session_id?: string | null
+          session_type?: string
+          started_at?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+          word_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "journal_entries_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: true
+            referencedRelation: "journal_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       journal_messages: {
         Row: {
           content: string
@@ -100,7 +156,7 @@ export type Database = {
           id?: string
           role: string
           session_id: string
-          user_id: string
+          user_id?: string
         }
         Update: {
           content?: string
@@ -126,6 +182,7 @@ export type Database = {
           ended_at: string | null
           id: string
           mood_score: number | null
+          session_type: string
           started_at: string
           status: string
           title: string | null
@@ -136,16 +193,18 @@ export type Database = {
           ended_at?: string | null
           id?: string
           mood_score?: number | null
+          session_type?: string
           started_at?: string
           status?: string
           title?: string | null
-          user_id: string
+          user_id?: string
         }
         Update: {
           created_at?: string
           ended_at?: string | null
           id?: string
           mood_score?: number | null
+          session_type?: string
           started_at?: string
           status?: string
           title?: string | null

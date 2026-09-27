@@ -8,6 +8,13 @@
       "when": 1790516408683,
       "tag": "0000_reflective_phase1_schema",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790518012440,
+      "tag": "0001_phase2_journal_entries",
+      "breakpoints": true
     }
   ]
 }
