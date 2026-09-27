@@ -51,10 +51,11 @@ function Onboarding() {
   const [sessionError, setSessionError] = useState(false);
   const busy = useRef(false);
   const prefilled = useRef(false);
+  const chose = useRef(false);
 
   // Returning users never see onboarding again.
   useEffect(() => {
-    if (profile?.onboarded_at && !busy.current) navigate({ to: "/journal", replace: true });
+    if (profile?.onboarded_at && !chose.current) navigate({ to: "/journal", replace: true });
   }, [profile?.onboarded_at, navigate]);
 
   // Resume safely after a refresh: keep whatever was already saved.
@@ -92,6 +93,7 @@ function Onboarding() {
   async function choose(mode: Mode) {
     if (busy.current) return; // double-tap guard: one save, one session
     busy.current = true;
+    chose.current = true;
     setPending(mode);
     setSessionError(false);
     try {
@@ -103,6 +105,7 @@ function Onboarding() {
     } catch {
       toast.error("Couldn't save that. Please try again.");
       busy.current = false;
+      chose.current = false;
       setPending(null);
       return;
     }
