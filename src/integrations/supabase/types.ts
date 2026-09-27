@@ -238,44 +238,91 @@ export type Database = {
       }
       memories: {
         Row: {
+          confidence_score: number
           content: string
           created_at: string
           embedding: string | null
+          embedding_error: string | null
+          embedding_model: string | null
+          embedding_status: string
+          embedding_v: unknown
           id: string
           importance: number
+          importance_score: number
+          journal_entry_id: string | null
           kind: string
+          last_referenced_at: string | null
+          memory_type: string
+          previous_content: string | null
           source_session_id: string | null
+          superseded_by: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          confidence_score?: number
           content: string
           created_at?: string
           embedding?: string | null
+          embedding_error?: string | null
+          embedding_model?: string | null
+          embedding_status?: string
+          embedding_v?: unknown
           id?: string
           importance?: number
+          importance_score?: number
+          journal_entry_id?: string | null
           kind?: string
+          last_referenced_at?: string | null
+          memory_type?: string
+          previous_content?: string | null
           source_session_id?: string | null
+          superseded_by?: string | null
           updated_at?: string
-          user_id: string
+          user_id?: string
         }
         Update: {
+          confidence_score?: number
           content?: string
           created_at?: string
           embedding?: string | null
+          embedding_error?: string | null
+          embedding_model?: string | null
+          embedding_status?: string
+          embedding_v?: unknown
           id?: string
           importance?: number
+          importance_score?: number
+          journal_entry_id?: string | null
           kind?: string
+          last_referenced_at?: string | null
+          memory_type?: string
+          previous_content?: string | null
           source_session_id?: string | null
+          superseded_by?: string | null
           updated_at?: string
           user_id?: string
         }
         Relationships: [
           {
+            foreignKeyName: "memories_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
+            referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "memories_source_session_id_fkey"
             columns: ["source_session_id"]
             isOneToOne: false
             referencedRelation: "journal_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "memories_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "memories"
             referencedColumns: ["id"]
           },
         ]
@@ -568,7 +615,21 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      match_memories: {
+        Args: {
+          match_count?: number
+          min_similarity?: number
+          query_embedding: unknown
+        }
+        Returns: {
+          content: string
+          created_at: string
+          id: string
+          journal_entry_id: string
+          memory_type: string
+          similarity: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

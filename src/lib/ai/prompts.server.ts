@@ -7,7 +7,7 @@ const STYLE: Record<ReflectionStyle, string> = {
   practical: "Tone: practical; lean toward concrete next steps when the user wants them.",
 };
 
-export function companionSystemPrompt(opts: { name?: string | null | undefined; style?: string | null | undefined; rollingSummary?: string | null | undefined }) {
+export function companionSystemPrompt(opts: { name?: string | null | undefined; style?: string | null | undefined; rollingSummary?: string | null | undefined; memories?: { content: string; date: string }[] }) {
   const style = STYLE[(opts.style as ReflectionStyle) ?? "curious"] ?? STYLE.curious;
   return [
     "You are Reflective, a private AI journaling companion. You help the user think out loud.",
@@ -20,6 +20,13 @@ export function companionSystemPrompt(opts: { name?: string | null | undefined; 
     style,
     opts.name ? `The user's name is ${opts.name}. Use it rarely.` : "",
     opts.rollingSummary ? `Earlier in this session (summary): ${opts.rollingSummary}` : "",
+    opts.memories?.length
+      ? [
+          "Relevant past memories (background notes from earlier entries — may be outdated, not certain truth):",
+          ...opts.memories.map((m) => `- (${m.date}) ${m.content}`),
+          "Use them only when genuinely relevant, and gently. Never mention memory retrieval, notes or databases. If the user's current words contradict a memory, trust what they say now and never argue from the old memory.",
+        ].join("\n")
+      : "",
   ]
     .filter(Boolean)
     .join("\n");

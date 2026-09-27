@@ -1345,3 +1345,5 @@ Then continue through the phases sequentially, verifying each phase before movin
 Do not copy the appearance, wording, branding, proprietary prompts, or copyrighted assets of Rosebud.
 
 Create an original product named Reflective.
+- Long-term memory lives in `src/lib/ai/memory.server.ts` (filter thresholds in `MEMORY`, `EMBEDDING_MODEL` env, default google/gemini-embedding-2 at 3072 dims stored as `memories.embedding_v halfvec(3072)` with HNSW cosine); vector search only via `match_memories` RPC (SECURITY INVOKER, hard-scoped to auth.uid()), called with the user's JWT client so RLS always applies.
+- Memory work never blocks journaling: saving runs after the entry is stored, retrieval failures return [] and chat continues, failed embeddings stay as `embedding_status='failed'` and are retried.

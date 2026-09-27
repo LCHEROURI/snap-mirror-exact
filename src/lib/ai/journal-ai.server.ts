@@ -7,6 +7,7 @@ import { ANALYSIS_SYSTEM_PROMPT, ROLLING_SUMMARY_PROMPT, companionSystemPrompt }
 import { SAFETY_RESPONSE, needsSafetyResponse } from "./safety.server";
 import { analysisWireSchema, validateAnalysis } from "./analysis";
 import { PLACEHOLDER_PREFIX } from "../companion/types";
+import { retrieveMemories, saveEntryMemories, retryPendingEmbeddings } from "./memory.server";
 
 type Db = SupabaseClient<Database>;
 
@@ -100,10 +101,12 @@ export async function sendMessage(db: Db, userId: string, sessionId: string, mes
     const rows = await allMessages(db, sessionId);
     const rolling = await refreshRollingSummary(db, session, rows);
     const { data: profile } = await db.from("profiles").select("display_name, reflection_style").eq("id", userId).maybeSingle();
+    const memories = await retrieveMemories(db, userId, text);
     const system = companionSystemPrompt({
       name: profile?.display_name?.split(" ")[0],
       style: profile?.reflection_style,
       rollingSummary: rolling,
+      memories: memories.map((m) => ({ content: m.content, date: m.created_at.slice(0, 10) })),
     });
     try {
       reply = await generateReply(system, toModel(rows.slice(-CONTEXT.recentMessages)));
@@ -133,9 +136,10 @@ export async function retryReply(db: Db, userId: string, sessionId: string) {
     ? SAFETY_RESPONSE
     : await (async () => {
         const { data: profile } = await db.from("profiles").select("display_name, reflection_style").eq("id", userId).maybeSingle();
+        const memories = await retrieveMemories(db, userId, last.content);
         try {
           return await generateReply(
-            companionSystemPrompt({ name: profile?.display_name?.split(" ")[0], style: profile?.reflection_style, rollingSummary: session.rolling_summary }),
+            companionSystemPrompt({ name: profile?.display_name?.split(" ")[0], style: profile?.reflection_style, rollingSummary: session.rolling_summary, memories: memories.map((m) => ({ content: m.content, date: m.created_at.slice(0, 10) })) }),
             toModel(rows.slice(-CONTEXT.recentMessages)),
           );
         } catch (e) {
@@ -198,7 +202,7 @@ export async function finishSession(db: Db, userId: string, sessionId: string) {
 }
 
 export async function analyzeEntry(db: Db, entryId: string): Promise<{ ok: boolean }> {
-  const { data: entry, error } = await db.from("journal_entries").select("id, session_id, title").eq("id", entryId).maybeSingle();
+  const { data: entry, error } = await db.from("journal_entries").select("id, session_id, title, user_id").eq("id", entryId).maybeSingle();
   if (error || !entry) throw new JournalError("not_found", "This entry wasn't found.");
   if (!entry.session_id) throw new JournalError("invalid", "This entry has no transcript to analyse.");
   const rows = await allMessages(db, entry.session_id);
@@ -224,6 +228,10 @@ export async function analyzeEntry(db: Db, entryId: string): Promise<{ ok: boole
       })
       .eq("id", entryId);
     if (uErr) throw uErr;
+    // Memory pipeline runs after the entry is safely saved; it never fails the entry.
+    await retryPendingEmbeddings(db, 10).catch(() => 0);
+    const memoryStats = await saveEntryMemories(db, entry.user_id, entryId, a.memory_candidates);
+    console.info("[memory] saved", memoryStats);
     return { ok: true };
   } catch (e) {
     const msg = e instanceof AiError ? e.message : "The analysis couldn't be completed.";
