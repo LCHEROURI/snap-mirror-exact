@@ -67,11 +67,11 @@ export async function generateReply(system: string, messages: ModelMessage[], mo
   }
 }
 
-export async function generateObject<T>(system: string, prompt: string, schema: z.ZodType<T>) {
+export async function generateObject<T>(system: string, prompt: string, schema: z.ZodType<T>, modelId?: string) {
   const { p, cfg } = provider();
   try {
     const result = streamText({
-      model: p.responses(cfg.analysisModel),
+      model: p.responses(modelId ?? cfg.analysisModel),
       system,
       prompt,
       output: Output.object({ schema }),
