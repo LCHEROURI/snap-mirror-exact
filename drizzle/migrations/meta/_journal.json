@@ -15,6 +15,13 @@
       "when": 1790518012440,
       "tag": "0001_phase2_journal_entries",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790518605737,
+      "tag": "0002_phase3_analysis",
+      "breakpoints": true
     }
   ]
 }

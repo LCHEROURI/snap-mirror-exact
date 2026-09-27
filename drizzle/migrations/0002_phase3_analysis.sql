@@ -1,0 +1,11 @@
+ALTER TABLE public.journal_entries ADD COLUMN IF NOT EXISTS summary text;
+ALTER TABLE public.journal_entries ADD COLUMN IF NOT EXISTS narrative text;
+ALTER TABLE public.journal_entries ADD COLUMN IF NOT EXISTS analysis jsonb;
+ALTER TABLE public.journal_entries ADD COLUMN IF NOT EXISTS analysis_status text NOT NULL DEFAULT 'pending';
+ALTER TABLE public.journal_entries ADD COLUMN IF NOT EXISTS analysis_error text;
+ALTER TABLE public.journal_entries ADD COLUMN IF NOT EXISTS analyzed_at timestamptz;
+ALTER TABLE public.journal_entries ADD CONSTRAINT journal_entries_analysis_status_check CHECK (analysis_status IN ('pending','complete','failed'));
+ALTER TABLE public.journal_sessions ADD COLUMN IF NOT EXISTS rolling_summary text;
+ALTER TABLE public.journal_sessions ADD COLUMN IF NOT EXISTS rolling_summary_count integer NOT NULL DEFAULT 0;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS reflection_style text;
+ALTER TABLE public.profiles ADD CONSTRAINT profiles_reflection_style_check CHECK (reflection_style IS NULL OR reflection_style IN ('gentle','curious','direct','practical'));

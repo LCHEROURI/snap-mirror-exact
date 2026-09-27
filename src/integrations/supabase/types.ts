@@ -87,45 +87,63 @@ export type Database = {
       }
       journal_entries: {
         Row: {
+          analysis: Json | null
+          analysis_error: string | null
+          analysis_status: string
+          analyzed_at: string | null
           completed_at: string
           created_at: string
           id: string
           message_count: number
           mood_score: number | null
+          narrative: string | null
           preview: string | null
           session_id: string | null
           session_type: string
           started_at: string
+          summary: string | null
           title: string
           updated_at: string
           user_id: string
           word_count: number
         }
         Insert: {
+          analysis?: Json | null
+          analysis_error?: string | null
+          analysis_status?: string
+          analyzed_at?: string | null
           completed_at?: string
           created_at?: string
           id?: string
           message_count?: number
           mood_score?: number | null
+          narrative?: string | null
           preview?: string | null
           session_id?: string | null
           session_type?: string
           started_at?: string
+          summary?: string | null
           title?: string
           updated_at?: string
           user_id?: string
           word_count?: number
         }
         Update: {
+          analysis?: Json | null
+          analysis_error?: string | null
+          analysis_status?: string
+          analyzed_at?: string | null
           completed_at?: string
           created_at?: string
           id?: string
           message_count?: number
           mood_score?: number | null
+          narrative?: string | null
           preview?: string | null
           session_id?: string | null
           session_type?: string
           started_at?: string
+          summary?: string | null
           title?: string
           updated_at?: string
           user_id?: string
@@ -182,6 +200,8 @@ export type Database = {
           ended_at: string | null
           id: string
           mood_score: number | null
+          rolling_summary: string | null
+          rolling_summary_count: number
           session_type: string
           started_at: string
           status: string
@@ -193,6 +213,8 @@ export type Database = {
           ended_at?: string | null
           id?: string
           mood_score?: number | null
+          rolling_summary?: string | null
+          rolling_summary_count?: number
           session_type?: string
           started_at?: string
           status?: string
@@ -204,6 +226,8 @@ export type Database = {
           ended_at?: string | null
           id?: string
           mood_score?: number | null
+          rolling_summary?: string | null
+          rolling_summary_count?: number
           session_type?: string
           started_at?: string
           status?: string
@@ -323,6 +347,7 @@ export type Database = {
           id: string
           journaling_intention: string | null
           onboarded_at: string | null
+          reflection_style: string | null
           reminder_preference: string
           updated_at: string
         }
@@ -333,6 +358,7 @@ export type Database = {
           id: string
           journaling_intention?: string | null
           onboarded_at?: string | null
+          reflection_style?: string | null
           reminder_preference?: string
           updated_at?: string
         }
@@ -343,6 +369,7 @@ export type Database = {
           id?: string
           journaling_intention?: string | null
           onboarded_at?: string | null
+          reflection_style?: string | null
           reminder_preference?: string
           updated_at?: string
         }
