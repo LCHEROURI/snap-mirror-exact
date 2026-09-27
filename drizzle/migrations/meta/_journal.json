@@ -64,6 +64,13 @@
       "when": 1790522200098,
       "tag": "0008_phase9_privacy",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1790523071465,
+      "tag": "0009_phase10_ai_rate_limit",
+      "breakpoints": true
     }
   ]
 }
