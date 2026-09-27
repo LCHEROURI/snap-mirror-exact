@@ -14,7 +14,469 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      goal_checkins: {
+        Row: {
+          created_at: string
+          goal_id: string
+          id: string
+          note: string | null
+          progress: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          goal_id: string
+          id?: string
+          note?: string | null
+          progress?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          goal_id?: string
+          id?: string
+          note?: string | null
+          progress?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "goal_checkins_goal_id_fkey"
+            columns: ["goal_id"]
+            isOneToOne: false
+            referencedRelation: "goals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      goals: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          progress: number
+          status: string
+          target_date: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          progress?: number
+          status?: string
+          target_date?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          progress?: number
+          status?: string
+          target_date?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      journal_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          role: string
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          role: string
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          role?: string
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "journal_messages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "journal_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      journal_sessions: {
+        Row: {
+          created_at: string
+          ended_at: string | null
+          id: string
+          mood_score: number | null
+          started_at: string
+          status: string
+          title: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          mood_score?: number | null
+          started_at?: string
+          status?: string
+          title?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          mood_score?: number | null
+          started_at?: string
+          status?: string
+          title?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      memories: {
+        Row: {
+          content: string
+          created_at: string
+          embedding: string | null
+          id: string
+          importance: number
+          kind: string
+          source_session_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          embedding?: string | null
+          id?: string
+          importance?: number
+          kind?: string
+          source_session_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          embedding?: string | null
+          id?: string
+          importance?: number
+          kind?: string
+          source_session_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "memories_source_session_id_fkey"
+            columns: ["source_session_id"]
+            isOneToOne: false
+            referencedRelation: "journal_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mood_entries: {
+        Row: {
+          id: string
+          note: string | null
+          recorded_at: string
+          score: number
+          session_id: string | null
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          note?: string | null
+          recorded_at?: string
+          score: number
+          session_id?: string | null
+          user_id: string
+        }
+        Update: {
+          id?: string
+          note?: string | null
+          recorded_at?: string
+          score?: number
+          session_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mood_entries_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "journal_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      people: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          relationship: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          relationship?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          relationship?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          ai_memory_enabled: boolean
+          created_at: string
+          display_name: string | null
+          id: string
+          journaling_intention: string | null
+          onboarded_at: string | null
+          reminder_preference: string
+          updated_at: string
+        }
+        Insert: {
+          ai_memory_enabled?: boolean
+          created_at?: string
+          display_name?: string | null
+          id: string
+          journaling_intention?: string | null
+          onboarded_at?: string | null
+          reminder_preference?: string
+          updated_at?: string
+        }
+        Update: {
+          ai_memory_enabled?: boolean
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          journaling_intention?: string | null
+          onboarded_at?: string | null
+          reminder_preference?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      session_goals: {
+        Row: {
+          goal_id: string
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          goal_id: string
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          goal_id?: string
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_goals_goal_id_fkey"
+            columns: ["goal_id"]
+            isOneToOne: false
+            referencedRelation: "goals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_goals_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "journal_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      session_people: {
+        Row: {
+          person_id: string
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          person_id: string
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          person_id?: string
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_people_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_people_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "journal_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      session_summaries: {
+        Row: {
+          created_at: string
+          id: string
+          mood_score: number | null
+          next_prompt: string | null
+          notable_moments: string[]
+          session_id: string
+          summary: string
+          themes: string[]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          mood_score?: number | null
+          next_prompt?: string | null
+          notable_moments?: string[]
+          session_id: string
+          summary: string
+          themes?: string[]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          mood_score?: number | null
+          next_prompt?: string | null
+          notable_moments?: string[]
+          session_id?: string
+          summary?: string
+          themes?: string[]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_summaries_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: true
+            referencedRelation: "journal_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      session_topics: {
+        Row: {
+          session_id: string
+          topic_id: string
+          user_id: string
+        }
+        Insert: {
+          session_id: string
+          topic_id: string
+          user_id: string
+        }
+        Update: {
+          session_id?: string
+          topic_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_topics_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "journal_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_topics_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      topics: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      weekly_reports: {
+        Row: {
+          content: Json
+          created_at: string
+          id: string
+          user_id: string
+          week_start: string
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          id?: string
+          user_id: string
+          week_start: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          id?: string
+          user_id?: string
+          week_start?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
