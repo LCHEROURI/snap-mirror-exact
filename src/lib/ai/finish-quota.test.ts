@@ -1,8 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const generateObject = vi.fn(async () => {
-  throw new Error("model unavailable in test");
-});
+const { generateObject } = vi.hoisted(() => ({ generateObject: vi.fn(async () => ({})) })); // invalid output -> analysis fails safely
 vi.mock("./gateway.server", () => ({
   AiError: class extends Error {},
   generateObject: (...a: unknown[]) => generateObject(...(a as [])),
