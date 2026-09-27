@@ -1357,3 +1357,5 @@ Create an original product named Reflective.
 - PWA service worker is shell-only (offline page only, never data/API responses) and is not registered in dev, iframes or preview hosts — avoids stale builds and private data on disk.
 - Expensive AI server functions call `allowAi()` (per-user `consume_ai_quota`) first; it fails open and finishing a session is never limited, so the limiter can't lose journal content.
 - Unsent reflection drafts are kept in localStorage per session and cleared on send; after a network error the transcript is re-read to avoid duplicate sends.
+- `ai_usage` is written only by the SECURITY DEFINER `consume_ai_quota` (kind whitelist, capped limits); users can read but not insert/delete rows, so quotas can't be reset. Finishing always saves; analysis on finish obeys the `analysis` quota and is deferred (`pending`) when exhausted.
+- Ask My Journal date phrases resolve in `profiles.timezone` via `src/lib/ask-range.ts` (DST-safe local midnights, UTC fallback).

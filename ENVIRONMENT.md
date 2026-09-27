@@ -1,6 +1,6 @@
 # Environment
 
-Names only — never commit values. Server variables are read inside server handlers only.
+Names only — never commit values. `.env` is ignored; `.env.example` lists the names. Server variables are read inside server handlers only.
 
 ## Browser-safe (auto-provided)
 - `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_SUPABASE_PROJECT_ID`
@@ -19,5 +19,5 @@ Names only — never commit values. Server variables are read inside server hand
 
 ## Setup
 - Local: `bun install && bun run dev`. Migrations live in `drizzle/migrations/` and are applied in order.
-- Tests: `bunx vitest run`; cross-account security: `bun scripts/security-check.ts` (needs the server-only vars; creates and deletes two temporary accounts).
+- Tests: `bunx vitest run`; cross-account security: `bun scripts/security-check.ts` (needs `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SERVICE_ROLE_KEY`; includes quota-bypass checks; creates and deletes two temporary accounts).
 - Deploy: publish from Lovable. Auth email confirmation stays on; add the published domain to auth redirect URLs.

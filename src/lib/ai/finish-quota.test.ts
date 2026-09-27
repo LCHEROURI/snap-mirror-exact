@@ -17,6 +17,7 @@ const { finishSession } = await import("./journal-ai.server");
 /** Minimal chainable stand-in for the database client; records inserts. */
 function fakeDb() {
   const inserts: string[] = [];
+  let entryReads = 0;
   const results: Record<string, unknown> = {
     journal_sessions: { id: "s1", status: "active", session_type: "text", started_at: "2026-01-01T00:00:00Z", rolling_summary: null, rolling_summary_count: 0 },
     journal_messages: [{ id: "m1", role: "user", content: "Hello there", created_at: "2026-01-01T00:00:00Z" }],
@@ -29,7 +30,7 @@ function fakeDb() {
         select: () => b, eq: () => b, order: () => b,
         insert: () => { mode = "insert"; inserts.push(table); return b; },
         update: () => { mode = "update"; return b; },
-        maybeSingle: async () => ({ data: table === "journal_entries" ? (mode === "select" ? null : { id: "e1", session_id: "s1", title: "t", user_id: "u1" }) : results[table], error: null }),
+        maybeSingle: async () => ({ data: table === "journal_entries" ? (mode === "select" && entryReads++ === 0 ? null : { id: "e1", session_id: "s1", title: "t", user_id: "u1" }) : results[table], error: null }),
         single: async () => ({ data: { id: "e1" }, error: null }),
         then: (r: (v: unknown) => void) => r({ data: results[table] ?? null, error: null }),
       };
