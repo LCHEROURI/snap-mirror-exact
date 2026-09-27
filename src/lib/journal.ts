@@ -116,18 +116,11 @@ export async function renameEntry(id: string, title: string) {
   if (error) throw error;
 }
 
-/** Deletes the entry and its own transcript (session + messages). Nothing else is touched. */
+/** Deletes the entry, its transcript (session + messages) and mood check-ins tied to it, in one transaction.
+ *  Memories, goals, topics and people are kept; their links to this entry are cleared. */
 export async function deleteEntry(id: string) {
-  const entry = await fetchEntry(id);
-  if (!entry) return;
-  const { error } = await supabase.from("journal_entries").delete().eq("id", id);
+  const { error } = await supabase.rpc("delete_journal_entry", { p_entry_id: id });
   if (error) throw error;
-  if (entry.session_id) {
-    const m = await supabase.from("journal_messages").delete().eq("session_id", entry.session_id);
-    if (m.error) throw m.error;
-    const s = await supabase.from("journal_sessions").delete().eq("id", entry.session_id);
-    if (s.error) throw s.error;
-  }
 }
 
 export function formatDate(iso: string, withTime = false) {
