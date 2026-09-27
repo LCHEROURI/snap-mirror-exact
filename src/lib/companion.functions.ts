@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { RATE_LIMITED, allowAi } from "./ai/rate-limit.server";
 import { JournalError, analyzeEntry, finishSession, retryReply, sendMessage } from "./ai/journal-ai.server";
 
 // Errors are returned as values so the UI always gets a safe, readable message.
@@ -16,6 +17,7 @@ export const sendJournalMessage = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ sessionId: z.string().uuid(), message: z.string().min(1).max(8000) }).parse(d))
   .handler(async ({ data, context }) => {
     try {
+      if (!(await allowAi(context.supabase, "chat"))) return RATE_LIMITED;
       return { ok: true as const, ...(await sendMessage(context.supabase, context.userId, data.sessionId, data.message)) };
     } catch (e) {
       return fail(e);
@@ -27,6 +29,7 @@ export const retryJournalReply = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ sessionId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     try {
+      if (!(await allowAi(context.supabase, "chat"))) return RATE_LIMITED;
       return { ok: true as const, ...(await retryReply(context.supabase, context.userId, data.sessionId)) };
     } catch (e) {
       return fail(e);
@@ -38,6 +41,7 @@ export const finishJournalSession = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ sessionId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     try {
+      // Never rate-limited: finishing must always save the entry.
       return { ok: true as const, ...(await finishSession(context.supabase, context.userId, data.sessionId)) };
     } catch (e) {
       return fail(e);
@@ -49,6 +53,7 @@ export const retryEntryAnalysis = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ entryId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     try {
+      if (!(await allowAi(context.supabase, "analysis"))) return RATE_LIMITED;
       const r = await analyzeEntry(context.supabase, data.entryId);
       return { ok: true as const, analysisOk: r.ok };
     } catch (e) {

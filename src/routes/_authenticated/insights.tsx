@@ -18,7 +18,7 @@ function Card({ title, to, children }: { title: string; to?: "/topics" | "/peopl
     <section className="rounded-2xl border border-border bg-card p-5" aria-label={title}>
       <div className="flex items-baseline justify-between gap-2">
         <h2 className="font-serif text-lg">{title}</h2>
-        {to && <Link to={to} className="text-xs text-muted-foreground underline-offset-2 hover:underline">See all</Link>}
+        {to && <Link to={to} className="-my-3 -mr-2 inline-flex min-h-11 items-center px-2 text-xs text-muted-foreground underline-offset-2 hover:underline">See all</Link>}
       </div>
       <div className="mt-3 text-sm">{children}</div>
     </section>

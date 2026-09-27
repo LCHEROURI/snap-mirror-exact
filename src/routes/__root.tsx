@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { registerServiceWorker } from "@/lib/pwa";
 import { THEME_BOOT, applyTheme, currentTheme } from "@/lib/theme";
 
 function NotFoundComponent() {
@@ -79,7 +80,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
+      { name: "theme-color", content: "#faefdb", media: "(prefers-color-scheme: light)" },
+      { name: "theme-color", content: "#231915", media: "(prefers-color-scheme: dark)" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-title", content: "Reflective" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "default" },
       { title: "Reflective — AI journaling and reflection" },
       {
         name: "description",
@@ -102,7 +109,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=Karla:ital,wght@0,300..700;1,300..600&display=swap",
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/favicon.png", type: "image/png" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "apple-touch-icon", href: "/icons/apple-touch-icon.png" },
     ],
   }),
   shellComponent: RootShell,
@@ -131,6 +140,7 @@ function RootComponent() {
   const router = useRouter();
 
   useEffect(() => applyTheme(currentTheme()), []);
+  useEffect(() => registerServiceWorker(), []);
 
   useEffect(() => {
     const { data } = supabase.auth.onAuthStateChange((event) => {

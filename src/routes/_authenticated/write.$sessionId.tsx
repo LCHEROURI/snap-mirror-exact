@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { MessageBubble } from "@/components/message-bubble";
+import { useOnline } from "@/hooks/use-online";
 import { fetchMessages, fetchSession, setSessionStatus, type JournalMessage } from "@/lib/journal";
 import { finishJournalSession, retryJournalReply, sendJournalMessage } from "@/lib/companion.functions";
 
@@ -37,7 +38,18 @@ function WriteSession() {
   const finishFn = useServerFn(finishJournalSession);
   const busyRef = useRef(false);
   const [replyError, setReplyError] = useState<string | null>(null);
+  const draftKey = `reflective-draft:${sessionId}`;
   const [draft, setDraft] = useState("");
+  const online = useOnline();
+  // Unsent text survives reloads, sign-in expiry and dropped connections (kept only on this device).
+  useEffect(() => {
+    const saved = localStorage.getItem(draftKey);
+    if (saved) setDraft(saved);
+  }, [draftKey]);
+  useEffect(() => {
+    if (draft) localStorage.setItem(draftKey, draft);
+    else localStorage.removeItem(draftKey);
+  }, [draft, draftKey]);
   const [sending, setSending] = useState(false);
   const [finishing, setFinishing] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -74,6 +86,10 @@ function WriteSession() {
       }
     } catch (e) {
       setReplyError(authOrNetwork(e));
+      // The server may have saved the message before the connection dropped: avoid a duplicate resend.
+      const fresh = await messages.refetch().catch(() => null);
+      const last = fresh?.data?.filter((m) => m.role === "user").at(-1);
+      if (last && last.content.trim() === text) setDraft("");
     } finally {
       busyRef.current = false;
       setSending(false);
@@ -217,9 +233,14 @@ function WriteSession() {
           className="border-t border-border bg-card/80 px-3 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-6"
           onSubmit={(e) => { e.preventDefault(); send(); }}
         >
+          {!online && (
+            <p role="status" className="mx-auto mb-2 max-w-2xl text-xs text-muted-foreground">
+              You're offline. Your draft is kept on this device — send it when you're back online.
+            </p>
+          )}
           <div className="mx-auto flex max-w-2xl items-end gap-2">
-            <Button type="button" variant="ghost" size="icon" disabled aria-label="Voice input arrives in a later phase" title="Voice arrives later">
-              <Mic className="size-5" />
+            <Button type="button" variant="ghost" size="icon" asChild>
+              <Link to="/voice" aria-label="Start a voice reflection instead"><Mic className="size-5" /></Link>
             </Button>
             <Textarea
               value={draft}
@@ -231,7 +252,7 @@ function WriteSession() {
               className="max-h-40 min-h-11 resize-none bg-background"
               aria-label="Your message"
             />
-            <Button type="submit" size="icon" disabled={!draft.trim() || paused || sending} aria-label="Send">
+            <Button type="submit" size="icon" disabled={!draft.trim() || paused || sending || !online} aria-label="Send">
               <Send className="size-4" />
             </Button>
           </div>

@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_usage: {
+        Row: {
+          created_at: string
+          id: number
+          kind: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          kind: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          kind?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       entry_people: {
         Row: {
           created_at: string
@@ -801,6 +822,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      consume_ai_quota: {
+        Args: { p_kind: string; p_limit: number; p_window_seconds: number }
+        Returns: boolean
+      }
       delete_all_memories: { Args: never; Returns: undefined }
       delete_all_personal_data: { Args: never; Returns: undefined }
       delete_journal_entry: { Args: { p_entry_id: string }; Returns: undefined }
