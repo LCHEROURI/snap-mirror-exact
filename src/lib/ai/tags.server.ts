@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
-import { cleanPersonName, cleanTopic, personKey } from "../tags";
+import { cleanPersonName, cleanTopic, personKey, personRelationship } from "../tags";
 
 type Db = SupabaseClient<Database>;
 
@@ -20,13 +20,14 @@ export async function linkEntryTags(db: Db, userId: string, entryId: string, top
       if (rows.length) await db.from("entry_topics").upsert(rows, { onConflict: "entry_id,topic_id", ignoreDuplicates: true });
     }
 
+    const rels = new Map(people.map((p) => [personKey(p), personRelationship(p)]));
     const pnames = [...new Map(people.map((p) => [personKey(p), cleanPersonName(p)])).entries()].filter(([k]) => k.length > 1);
     if (pnames.length) {
       const { data: existing } = await db.from("people").select("id, name, name_key");
       const byKey = new Map((existing ?? []).map((p) => [p.name_key ?? p.name.toLowerCase(), p.id]));
       const missing = pnames.filter(([k]) => !byKey.has(k));
       if (missing.length) {
-        const { data: ins } = await db.from("people").insert(missing.map(([k, name]) => ({ user_id: userId, name, name_key: k }))).select("id, name_key");
+        const { data: ins } = await db.from("people").insert(missing.map(([k, name]) => ({ user_id: userId, name, name_key: k, relationship: rels.get(k) ?? null }))).select("id, name_key");
         for (const p of ins ?? []) byKey.set(p.name_key!, p.id);
       }
       const rows = pnames.map(([k]) => byKey.get(k)).filter(Boolean).map((person_id) => ({ entry_id: entryId, person_id: person_id!, user_id: userId }));
