@@ -102,6 +102,8 @@ export type Database = {
           session_type: string
           started_at: string
           summary: string | null
+          summary_embedding: unknown
+          summary_embedding_status: string
           title: string
           updated_at: string
           user_id: string
@@ -123,6 +125,8 @@ export type Database = {
           session_type?: string
           started_at?: string
           summary?: string | null
+          summary_embedding?: unknown
+          summary_embedding_status?: string
           title?: string
           updated_at?: string
           user_id?: string
@@ -144,6 +148,8 @@ export type Database = {
           session_type?: string
           started_at?: string
           summary?: string | null
+          summary_embedding?: unknown
+          summary_embedding_status?: string
           title?: string
           updated_at?: string
           user_id?: string
@@ -615,6 +621,22 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      match_entries: {
+        Args: {
+          from_ts?: string
+          match_count?: number
+          min_similarity?: number
+          query_embedding: unknown
+          to_ts?: string
+        }
+        Returns: {
+          completed_at: string
+          id: string
+          similarity: number
+          summary: string
+          title: string
+        }[]
+      }
       match_memories: {
         Args: {
           match_count?: number
