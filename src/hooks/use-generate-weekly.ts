@@ -15,7 +15,13 @@ export function useGenerateWeekly() {
     setPending(true);
     setError(null);
     try {
-      const r = await gen({ data: { week_start: weekStart, regenerate, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone } });
+      const r = await gen({
+        data: {
+          week_start: weekStart,
+          regenerate,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        },
+      });
       if (!r.ok) {
         setError(r.error);
         return null;

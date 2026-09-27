@@ -1,9 +1,32 @@
 // Shared contract for voice providers so the screen doesn't care which path is live.
-export type VoiceState = "connecting" | "ready" | "listening" | "thinking" | "speaking" | "paused" | "reconnecting" | "ended" | "error";
+export type VoiceState =
+  | "connecting"
+  | "ready"
+  | "listening"
+  | "thinking"
+  | "speaking"
+  | "paused"
+  | "reconnecting"
+  | "ended"
+  | "error";
 
-export type VoiceErrorCode = "mic_blocked" | "no_mic" | "unsupported" | "unavailable" | "connection_lost" | "transcription" | "playback" | "expired" | "other";
+export type VoiceErrorCode =
+  | "mic_blocked"
+  | "no_mic"
+  | "unsupported"
+  | "unavailable"
+  | "connection_lost"
+  | "transcription"
+  | "playback"
+  | "expired"
+  | "other";
 
-export type TranscriptLine = { id: string; role: "user" | "assistant"; text: string; final: boolean };
+export type TranscriptLine = {
+  id: string;
+  role: "user" | "assistant";
+  text: string;
+  final: boolean;
+};
 
 export type VoiceEvents = {
   onState: (s: VoiceState) => void;
@@ -24,9 +47,11 @@ export interface VoiceProvider {
 }
 
 export const VOICE_MESSAGES: Record<VoiceErrorCode, string> = {
-  mic_blocked: "Microphone access is blocked. Enable microphone permission for this site in your browser settings, then try again.",
+  mic_blocked:
+    "Microphone access is blocked. Enable microphone permission for this site in your browser settings, then try again.",
   no_mic: "No microphone was found. Connect one, then try again.",
-  unsupported: "This browser doesn't support voice recording. Try a recent Chrome, Safari or Edge — or write instead.",
+  unsupported:
+    "This browser doesn't support voice recording. Try a recent Chrome, Safari or Edge — or write instead.",
   unavailable: "Voice service is unavailable right now.",
   connection_lost: "Connection lost. Your transcript so far is saved.",
   transcription: "Transcription failed. Please try that turn again.",
@@ -45,5 +70,10 @@ export function micError(e: unknown): VoiceErrorCode {
 }
 
 export function voiceSupported() {
-  return typeof navigator !== "undefined" && !!navigator.mediaDevices?.getUserMedia && typeof window !== "undefined" && "AudioContext" in window;
+  return (
+    typeof navigator !== "undefined" &&
+    !!navigator.mediaDevices?.getUserMedia &&
+    typeof window !== "undefined" &&
+    "AudioContext" in window
+  );
 }

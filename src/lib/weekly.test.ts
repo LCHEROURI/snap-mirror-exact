@@ -4,16 +4,24 @@ import { addDays, currentWeekStart, mondayOf, validateWeekly } from "./weekly";
 const base = {
   summary: "You mentioned the launch several times.",
   themes: [{ title: "Work", description: "Several entries focused on the launch." }],
-  wins: ["Shipped onboarding"], challenges: [], decisions: [], next_week: ["Pick one task each morning"],
+  wins: ["Shipped onboarding"],
+  challenges: [],
+  decisions: [],
+  next_week: ["Pick one task each morning"],
   patterns: [
     { observation: "You returned to the launch.", evidence_refs: ["E1", "E2", "E9"] },
     { observation: "Only once.", evidence_refs: ["E1"] },
   ],
-  goal_progress: [{ goal_ref: "G1", summary: "Two check-ins." }, { goal_ref: "G7", summary: "Invented." }],
+  goal_progress: [
+    { goal_ref: "G1", summary: "Two check-ins." },
+    { goal_ref: "G7", summary: "Invented." },
+  ],
   worth_noticing: "Clearer days followed a morning plan.",
 };
 const refs = new Set(["E1", "E2"]);
-const goals = new Map([["G1", { id: "11111111-1111-1111-1111-111111111111", title: "Finish onboarding" }]]);
+const goals = new Map([
+  ["G1", { id: "11111111-1111-1111-1111-111111111111", title: "Finish onboarding" }],
+]);
 
 describe("week math", () => {
   it("finds Monday", () => {
@@ -43,7 +51,15 @@ describe("validateWeekly", () => {
     expect(() => validateWeekly({ ...base, summary: "  " }, refs, goals)).toThrow();
   });
   it("strips diagnostic or absolute phrasing", () => {
-    const r = validateWeekly({ ...base, wins: ["You always win", "Finished a draft"], challenges: ["You appear depressed"] }, refs, goals);
+    const r = validateWeekly(
+      {
+        ...base,
+        wins: ["You always win", "Finished a draft"],
+        challenges: ["You appear depressed"],
+      },
+      refs,
+      goals,
+    );
     expect(r.wins).toEqual(["Finished a draft"]);
     expect(r.challenges).toEqual([]);
   });

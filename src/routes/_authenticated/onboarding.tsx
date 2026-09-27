@@ -139,9 +139,7 @@ function Onboarding() {
           <h1 className="font-serif text-3xl leading-tight tracking-tight">
             When would you like a nudge?
           </h1>
-          <p className="text-sm text-muted-foreground">
-            You can change this any time in settings.
-          </p>
+          <p className="text-sm text-muted-foreground">You can change this any time in settings.</p>
           <div className="space-y-2">
             {REMINDERS.map((option) => (
               <button

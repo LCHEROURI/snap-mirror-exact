@@ -7,8 +7,13 @@ export function registerServiceWorker() {
   const inIframe = window.self !== window.top;
   const previewHost = /(^|\.)id-preview--|lovableproject\.com$|localhost/.test(location.hostname);
   if (import.meta.env.DEV || inIframe || previewHost) {
-    navigator.serviceWorker.getRegistrations().then((rs) => rs.forEach((r) => r.unregister())).catch(() => {});
+    navigator.serviceWorker
+      .getRegistrations()
+      .then((rs) => rs.forEach((r) => r.unregister()))
+      .catch(() => {});
     return;
   }
-  navigator.serviceWorker.register("/sw.js").catch((e) => console.warn("[pwa] register failed", e?.name));
+  navigator.serviceWorker
+    .register("/sw.js")
+    .catch((e) => console.warn("[pwa] register failed", e?.name));
 }

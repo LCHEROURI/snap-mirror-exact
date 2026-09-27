@@ -38,7 +38,10 @@ function JournalHome() {
     }
   }, [isLoading, profile, navigate]);
 
-  const { data: sessions } = useQuery({ queryKey: ["entries", "recent"], queryFn: () => fetchEntries().then((r) => r.slice(0, 5)) });
+  const { data: sessions } = useQuery({
+    queryKey: ["entries", "recent"],
+    queryFn: () => fetchEntries().then((r) => r.slice(0, 5)),
+  });
   const { data: active } = useQuery({ queryKey: ["active-session"], queryFn: fetchActiveSession });
   const [starting, setStarting] = useState(false);
 
@@ -63,8 +66,12 @@ function JournalHome() {
       />
 
       <p className="-mt-3 mb-4 flex gap-4 px-5 text-sm sm:hidden">
-        <Link to="/ask" className="text-primary underline-offset-4 hover:underline">Ask my journal</Link>
-        <Link to="/settings" className="text-muted-foreground underline-offset-4 hover:underline">Settings</Link>
+        <Link to="/ask" className="text-primary underline-offset-4 hover:underline">
+          Ask my journal
+        </Link>
+        <Link to="/settings" className="text-muted-foreground underline-offset-4 hover:underline">
+          Settings
+        </Link>
       </p>
       <div className="px-5 sm:px-10">
         <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
@@ -74,15 +81,23 @@ function JournalHome() {
           </p>
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <Button className="w-full sm:w-auto" onClick={start} disabled={starting}>
-              {starting ? <Loader2 className="size-4 animate-spin" /> : <PenLine className="size-4" />}
+              {starting ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <PenLine className="size-4" />
+              )}
               Write
             </Button>
             <Button variant="outline" className="w-full sm:w-auto" asChild>
-              <Link to="/voice"><Mic className="size-4" /> Talk</Link>
+              <Link to="/voice">
+                <Mic className="size-4" /> Talk
+              </Link>
             </Button>
             {active && (
               <Button variant="outline" asChild className="w-full sm:w-auto">
-                <Link to="/write/$sessionId" params={{ sessionId: active.id }}>Continue unfinished reflection</Link>
+                <Link to="/write/$sessionId" params={{ sessionId: active.id }}>
+                  Continue unfinished reflection
+                </Link>
               </Button>
             )}
           </div>
@@ -96,9 +111,15 @@ function JournalHome() {
             <ul className="mt-4 divide-y divide-border rounded-2xl border border-border bg-card">
               {sessions.map((session) => (
                 <li key={session.id}>
-                  <Link to="/entries/$entryId" params={{ entryId: session.id }} className="block px-5 py-4 hover:bg-accent/40">
+                  <Link
+                    to="/entries/$entryId"
+                    params={{ entryId: session.id }}
+                    className="block px-5 py-4 hover:bg-accent/40"
+                  >
                     <p className="text-sm text-foreground">{session.title}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">{formatDate(session.started_at)}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {formatDate(session.started_at)}
+                    </p>
                   </Link>
                 </li>
               ))}

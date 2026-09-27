@@ -35,7 +35,10 @@ const openaiOptions = (reasoning: "low" | "medium") => ({
 
 /** Safe, user-facing error. Never includes provider details or journal text. */
 export class AiError extends Error {
-  constructor(public code: "credits" | "rate_limit" | "provider" | "malformed", message: string) {
+  constructor(
+    public code: "credits" | "rate_limit" | "provider" | "malformed",
+    message: string,
+  ) {
     super(message);
   }
 }
@@ -43,12 +46,24 @@ export class AiError extends Error {
 function mapError(e: unknown): never {
   const status = APICallError.isInstance(e) ? e.statusCode : undefined;
   console.error("[ai] call failed", { status, name: (e as Error)?.name });
-  if (status === 402) throw new AiError("credits", "AI credits have run out for this workspace. Please try again later.");
-  if (status === 429) throw new AiError("rate_limit", "The companion is busy right now. Please wait a moment and try again.");
+  if (status === 402)
+    throw new AiError(
+      "credits",
+      "AI credits have run out for this workspace. Please try again later.",
+    );
+  if (status === 429)
+    throw new AiError(
+      "rate_limit",
+      "The companion is busy right now. Please wait a moment and try again.",
+    );
   throw new AiError("provider", "The companion couldn't respond just now. Please try again.");
 }
 
-export async function generateReply(system: string, messages: ModelMessage[], model: "chat" | "analysis" = "chat") {
+export async function generateReply(
+  system: string,
+  messages: ModelMessage[],
+  model: "chat" | "analysis" = "chat",
+) {
   const { p, cfg } = provider();
   try {
     const result = streamText({
@@ -59,7 +74,8 @@ export async function generateReply(system: string, messages: ModelMessage[], mo
       onError: () => {}, // suppress SDK default logging, which can include private journal text
     });
     const text = (await result.text).trim();
-    if (!text) throw new AiError("provider", "The companion couldn't respond just now. Please try again.");
+    if (!text)
+      throw new AiError("provider", "The companion couldn't respond just now. Please try again.");
     return text;
   } catch (e) {
     if (e instanceof AiError) throw e;
@@ -67,7 +83,12 @@ export async function generateReply(system: string, messages: ModelMessage[], mo
   }
 }
 
-export async function generateObject<T>(system: string, prompt: string, schema: z.ZodType<T>, modelId?: string) {
+export async function generateObject<T>(
+  system: string,
+  prompt: string,
+  schema: z.ZodType<T>,
+  modelId?: string,
+) {
   const { p, cfg } = provider();
   try {
     const result = streamText({

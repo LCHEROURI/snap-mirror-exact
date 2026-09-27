@@ -3,13 +3,24 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { RATE_LIMITED, allowAi } from "./ai/rate-limit.server";
 import { JournalError, sendMessage } from "./ai/journal-ai.server";
-import { availableModes, createRealtimeSecret, ownedVoiceSession, saveRealtimeTurn, speakMessage, transcribe } from "./ai/voice.server";
+import {
+  availableModes,
+  createRealtimeSecret,
+  ownedVoiceSession,
+  saveRealtimeTurn,
+  speakMessage,
+  transcribe,
+} from "./ai/voice.server";
 
 type Fail = { ok: false; code: string; error: string };
 function fail(e: unknown): Fail {
   if (e instanceof JournalError) return { ok: false, code: e.code, error: e.message };
   console.error("[voice] unexpected", (e as Error)?.name);
-  return { ok: false, code: "unknown", error: "Something went wrong with voice. Your transcript so far is saved." };
+  return {
+    ok: false,
+    code: "unknown",
+    error: "Something went wrong with voice. Your transcript so far is saved.",
+  };
 }
 const sid = z.string().uuid();
 
@@ -33,7 +44,10 @@ export const realtimeSession = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     try {
       if (!(await allowAi(context.supabase, "realtime"))) return RATE_LIMITED;
-      return { ok: true as const, ...(await createRealtimeSecret(context.supabase, context.userId, data.sessionId)) };
+      return {
+        ok: true as const,
+        ...(await createRealtimeSecret(context.supabase, context.userId, data.sessionId)),
+      };
     } catch (e) {
       return fail(e);
     }
@@ -41,10 +55,29 @@ export const realtimeSession = createServerFn({ method: "POST" })
 
 export const realtimeTurn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({ sessionId: sid, role: z.enum(["user", "assistant"]), text: z.string().max(8000), itemId: z.string().min(1).max(200) }).parse(d))
+  .inputValidator((d) =>
+    z
+      .object({
+        sessionId: sid,
+        role: z.enum(["user", "assistant"]),
+        text: z.string().max(8000),
+        itemId: z.string().min(1).max(200),
+      })
+      .parse(d),
+  )
   .handler(async ({ data, context }) => {
     try {
-      return { ok: true as const, ...(await saveRealtimeTurn(context.supabase, context.userId, data.sessionId, data.role, data.text, data.itemId)) };
+      return {
+        ok: true as const,
+        ...(await saveRealtimeTurn(
+          context.supabase,
+          context.userId,
+          data.sessionId,
+          data.role,
+          data.text,
+          data.itemId,
+        )),
+      };
     } catch (e) {
       return fail(e);
     }
@@ -66,7 +99,12 @@ export const voiceTurn = createServerFn({ method: "POST" })
       await ownedVoiceSession(context.supabase, context.userId, data.sessionId);
       const text = await transcribe(data.audio);
       const r = await sendMessage(context.supabase, context.userId, data.sessionId, text);
-      return { ok: true as const, userText: r.userMessage.content, assistant: { id: r.assistantMessage.id, content: r.assistantMessage.content }, safety: r.safety };
+      return {
+        ok: true as const,
+        userText: r.userMessage.content,
+        assistant: { id: r.assistantMessage.id, content: r.assistantMessage.content },
+        safety: r.safety,
+      };
     } catch (e) {
       return fail(e);
     }

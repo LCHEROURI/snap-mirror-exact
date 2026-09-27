@@ -17,8 +17,18 @@ export const MEMORY = {
 };
 
 export const MEMORY_TYPES = [
-  "person", "goal", "preference", "event", "decision", "concern",
-  "achievement", "project", "relationship", "habit", "belief", "other",
+  "person",
+  "goal",
+  "preference",
+  "event",
+  "decision",
+  "concern",
+  "achievement",
+  "project",
+  "relationship",
+  "habit",
+  "belief",
+  "other",
 ] as const;
 
 // Moment-bound filler that rarely matters later.
@@ -32,7 +42,10 @@ export type Candidate = { type: string; content: string; importance: number; con
 export function filterCandidates(cands: Candidate[]): Candidate[] {
   const seen = new Set<string>();
   return cands
-    .map((c) => ({ ...c, content: c.content.replace(/\s+/g, " ").trim().slice(0, MEMORY.maxChars) }))
+    .map((c) => ({
+      ...c,
+      content: c.content.replace(/\s+/g, " ").trim().slice(0, MEMORY.maxChars),
+    }))
     .filter((c) => {
       const key = c.content.toLowerCase();
       if (seen.has(key)) return false;
@@ -44,7 +57,10 @@ export function filterCandidates(cands: Candidate[]): Candidate[] {
         !TRIVIAL.some((r) => r.test(c.content))
       );
     })
-    .map((c) => ({ ...c, type: (MEMORY_TYPES as readonly string[]).includes(c.type) ? c.type : "other" }));
+    .map((c) => ({
+      ...c,
+      type: (MEMORY_TYPES as readonly string[]).includes(c.type) ? c.type : "other",
+    }));
 }
 
 export function embeddingModel() {
@@ -57,7 +73,11 @@ export async function embedTexts(texts: string[]): Promise<number[][]> {
   const { apiKey, baseURL } = aiConfig();
   const res = await fetch(`${baseURL}/embeddings`, {
     method: "POST",
-    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json", "X-Lovable-AIG-SDK": "fetch" },
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+      "X-Lovable-AIG-SDK": "fetch",
+    },
     body: JSON.stringify({ model: embeddingModel(), input: texts }),
   });
   if (!res.ok) {
@@ -74,7 +94,11 @@ export async function embedTexts(texts: string[]): Promise<number[][]> {
 const toVec = (v: number[]) => `[${v.join(",")}]`;
 
 export async function memoryEnabled(db: Db, userId: string) {
-  const { data } = await db.from("profiles").select("ai_memory_enabled").eq("id", userId).maybeSingle();
+  const { data } = await db
+    .from("profiles")
+    .select("ai_memory_enabled")
+    .eq("id", userId)
+    .maybeSingle();
   return data?.ai_memory_enabled ?? true;
 }
 
@@ -89,8 +113,20 @@ async function nearest(db: Db, vec: number[]) {
 }
 
 /** Pipeline after analysis: filter → embed → dedupe → store. Never throws. */
-export async function saveEntryMemories(db: Db, userId: string, entryId: string, cands: Candidate[]) {
-  const stats = { candidates: cands.length, kept: 0, inserted: 0, updated: 0, unchanged: 0, pendingEmbedding: 0 };
+export async function saveEntryMemories(
+  db: Db,
+  userId: string,
+  entryId: string,
+  cands: Candidate[],
+) {
+  const stats = {
+    candidates: cands.length,
+    kept: 0,
+    inserted: 0,
+    updated: 0,
+    unchanged: 0,
+    pendingEmbedding: 0,
+  };
   try {
     if (!(await memoryEnabled(db, userId))) return stats;
     const kept = filterCandidates(cands);
@@ -111,23 +147,47 @@ export async function saveEntryMemories(db: Db, userId: string, entryId: string,
         journal_entry_id: entryId,
       };
       if (!vec) {
-        await db.from("memories").insert({ user_id: userId, content: c.content, ...base, embedding_status: "failed", embedding_error: "Will retry" });
+        await db.from("memories").insert({
+          user_id: userId,
+          content: c.content,
+          ...base,
+          embedding_status: "failed",
+          embedding_error: "Will retry",
+        });
         stats.pendingEmbedding++;
         continue;
       }
       const dup = await nearest(db, vec).catch(() => undefined);
       if (dup && dup.similarity >= MEMORY.identicalSimilarity) {
-        await db.from("memories").update({ importance_score: Math.max(c.importance, 0) }).eq("id", dup.id);
+        await db
+          .from("memories")
+          .update({ importance_score: Math.max(c.importance, 0) })
+          .eq("id", dup.id);
         stats.unchanged++;
       } else if (dup) {
         // Newer wording replaces the old one; the old text is kept as lineage.
         await db
           .from("memories")
-          .update({ ...base, content: c.content, previous_content: dup.content, embedding_v: toVec(vec), embedding_model: embeddingModel(), embedding_status: "ready", embedding_error: null })
+          .update({
+            ...base,
+            content: c.content,
+            previous_content: dup.content,
+            embedding_v: toVec(vec),
+            embedding_model: embeddingModel(),
+            embedding_status: "ready",
+            embedding_error: null,
+          })
           .eq("id", dup.id);
         stats.updated++;
       } else {
-        await db.from("memories").insert({ user_id: userId, content: c.content, ...base, embedding_v: toVec(vec), embedding_model: embeddingModel(), embedding_status: "ready" });
+        await db.from("memories").insert({
+          user_id: userId,
+          content: c.content,
+          ...base,
+          embedding_v: toVec(vec),
+          embedding_model: embeddingModel(),
+          embedding_status: "ready",
+        });
         stats.inserted++;
       }
     }
@@ -139,26 +199,54 @@ export async function saveEntryMemories(db: Db, userId: string, entryId: string,
 
 /** Re-embeds memories whose embedding failed or whose content was edited. */
 export async function retryPendingEmbeddings(db: Db, limit = 20) {
-  const { data } = await db.from("memories").select("id, content").neq("embedding_status", "ready").limit(limit);
+  const { data } = await db
+    .from("memories")
+    .select("id, content")
+    .neq("embedding_status", "ready")
+    .limit(limit);
   if (!data?.length) return 0;
   try {
     const vecs = await embedTexts(data.map((m) => m.content));
     await Promise.all(
       data.map((m, i) =>
-        db.from("memories").update({ embedding_v: toVec(vecs[i]!), embedding_model: embeddingModel(), embedding_status: "ready", embedding_error: null }).eq("id", m.id),
+        db
+          .from("memories")
+          .update({
+            embedding_v: toVec(vecs[i]!),
+            embedding_model: embeddingModel(),
+            embedding_status: "ready",
+            embedding_error: null,
+          })
+          .eq("id", m.id),
       ),
     );
     return data.length;
   } catch {
-    await db.from("memories").update({ embedding_status: "failed", embedding_error: "Will retry" }).in("id", data.map((m) => m.id));
+    await db
+      .from("memories")
+      .update({ embedding_status: "failed", embedding_error: "Will retry" })
+      .in(
+        "id",
+        data.map((m) => m.id),
+      );
     return 0;
   }
 }
 
-export type RetrievedMemory = { id: string; content: string; memory_type: string; created_at: string; similarity: number };
+export type RetrievedMemory = {
+  id: string;
+  content: string;
+  memory_type: string;
+  created_at: string;
+  similarity: number;
+};
 
 /** Relevant memories for the latest message. Returns [] on any failure so chat keeps working. */
-export async function retrieveMemories(db: Db, userId: string, text: string): Promise<RetrievedMemory[]> {
+export async function retrieveMemories(
+  db: Db,
+  userId: string,
+  text: string,
+): Promise<RetrievedMemory[]> {
   try {
     if (!(await memoryEnabled(db, userId))) return [];
     const [vec] = await embedTexts([text.slice(0, 2000)]);
@@ -170,7 +258,13 @@ export async function retrieveMemories(db: Db, userId: string, text: string): Pr
     if (error) throw error;
     const rows = data ?? [];
     if (rows.length)
-      await db.from("memories").update({ last_referenced_at: new Date().toISOString() }).in("id", rows.map((r) => r.id));
+      await db
+        .from("memories")
+        .update({ last_referenced_at: new Date().toISOString() })
+        .in(
+          "id",
+          rows.map((r) => r.id),
+        );
     return rows;
   } catch (e) {
     console.error("[memory] retrieval skipped", { name: (e as Error)?.name });
@@ -181,13 +275,27 @@ export async function retrieveMemories(db: Db, userId: string, text: string): Pr
 /** Edit a memory's text and re-embed it (only when content actually changes). */
 export async function editMemory(db: Db, id: string, content: string) {
   const clean = content.replace(/\s+/g, " ").trim().slice(0, MEMORY.maxChars);
-  const { data: cur, error } = await db.from("memories").select("id, content").eq("id", id).maybeSingle();
+  const { data: cur, error } = await db
+    .from("memories")
+    .select("id, content")
+    .eq("id", id)
+    .maybeSingle();
   if (error || !cur) throw new Error("not_found");
   if (cur.content === clean) return { reembedded: false };
-  let patch: Database["public"]["Tables"]["memories"]["Update"] = { content: clean, embedding_status: "pending", embedding_v: null };
+  let patch: Database["public"]["Tables"]["memories"]["Update"] = {
+    content: clean,
+    embedding_status: "pending",
+    embedding_v: null,
+  };
   try {
     const [vec] = await embedTexts([clean]);
-    patch = { content: clean, embedding_v: toVec(vec!), embedding_model: embeddingModel(), embedding_status: "ready", embedding_error: null };
+    patch = {
+      content: clean,
+      embedding_v: toVec(vec!),
+      embedding_model: embeddingModel(),
+      embedding_status: "ready",
+      embedding_error: null,
+    };
   } catch {
     patch.embedding_status = "failed";
     patch.embedding_error = "Will retry";

@@ -12,19 +12,37 @@ export const analysisWireSchema = z.object({
   wins: z.array(z.string()),
   concerns: z.array(z.string()),
   memory_candidates: z.array(
-    z.object({ type: z.string(), content: z.string(), importance: z.number(), confidence: z.number() }),
+    z.object({
+      type: z.string(),
+      content: z.string(),
+      importance: z.number(),
+      confidence: z.number(),
+    }),
   ),
-  goal_candidates: z.array(z.object({ title: z.string(), description: z.string(), next_action: z.string() })),
+  goal_candidates: z.array(
+    z.object({ title: z.string(), description: z.string(), next_action: z.string() }),
+  ),
 });
 
 export type JournalAnalysis = z.infer<typeof analysisWireSchema>;
 
 const MEMORY_TYPES = new Set([
-  "person", "goal", "preference", "event", "decision", "concern",
-  "achievement", "project", "relationship", "habit", "belief", "other",
+  "person",
+  "goal",
+  "preference",
+  "event",
+  "decision",
+  "concern",
+  "achievement",
+  "project",
+  "relationship",
+  "habit",
+  "belief",
+  "other",
 ]);
 
-const clean = (s: unknown, max: number) => (typeof s === "string" ? s.replace(/\s+/g, " ").trim().slice(0, max) : "");
+const clean = (s: unknown, max: number) =>
+  typeof s === "string" ? s.replace(/\s+/g, " ").trim().slice(0, max) : "";
 const list = (a: string[], n: number, max = 80) =>
   [...new Set(a.map((s) => clean(s, max)).filter(Boolean))].slice(0, n);
 const unit = (n: number) => (Number.isFinite(n) ? Math.min(1, Math.max(0, n > 1 ? n / 10 : n)) : 0);
@@ -55,7 +73,11 @@ export function validateAnalysis(raw: unknown): JournalAnalysis {
       .filter((m) => m.content)
       .slice(0, 5),
     goal_candidates: a.goal_candidates
-      .map((g) => ({ title: clean(g.title, 120), description: clean(g.description, 400), next_action: clean(g.next_action, 200) }))
+      .map((g) => ({
+        title: clean(g.title, 120),
+        description: clean(g.description, 400),
+        next_action: clean(g.next_action, 200),
+      }))
       .filter((g) => g.title)
       .slice(0, 3),
   };

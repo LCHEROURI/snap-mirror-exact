@@ -5,10 +5,13 @@ export const THEME_KEY = "reflective-theme";
 export const THEME_BOOT = `(function(){try{var t=localStorage.getItem("${THEME_KEY}")||"system";var d=t==="dark"||(t==="system"&&matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.classList.toggle("dark",d);}catch(e){}})();`;
 
 let mql: MediaQueryList | null = null;
-function onSystem() { if (currentTheme() === "system") paint("system"); }
+function onSystem() {
+  if (currentTheme() === "system") paint("system");
+}
 
 function paint(t: ThemePref) {
-  const dark = t === "dark" || (t === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  const dark =
+    t === "dark" || (t === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
   document.documentElement.classList.toggle("dark", dark);
 }
 
@@ -21,5 +24,8 @@ export function currentTheme(): ThemePref {
 export function applyTheme(t: ThemePref) {
   localStorage.setItem(THEME_KEY, t);
   paint(t);
-  if (!mql) { mql = window.matchMedia("(prefers-color-scheme: dark)"); mql.addEventListener("change", onSystem); }
+  if (!mql) {
+    mql = window.matchMedia("(prefers-color-scheme: dark)");
+    mql.addEventListener("change", onSystem);
+  }
 }

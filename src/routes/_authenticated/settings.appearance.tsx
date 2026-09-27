@@ -18,8 +18,16 @@ function AppearanceSettings() {
       <ChoiceGroup
         label="Theme"
         value={theme}
-        options={[{ value: "system", label: "System" }, { value: "light", label: "Light" }, { value: "dark", label: "Dark" }]}
-        onChange={(t) => { setTheme(t); applyTheme(t); save.mutate({ theme: t }); }}
+        options={[
+          { value: "system", label: "System" },
+          { value: "light", label: "Light" },
+          { value: "dark", label: "Dark" },
+        ]}
+        onChange={(t) => {
+          setTheme(t);
+          applyTheme(t);
+          save.mutate({ theme: t });
+        }}
       />
     </Section>
   );

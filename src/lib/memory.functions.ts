@@ -5,7 +5,9 @@ import { editMemory, retryPendingEmbeddings } from "./ai/memory.server";
 
 export const updateMemory = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({ id: z.string().uuid(), content: z.string().min(3).max(600) }).parse(d))
+  .inputValidator((d) =>
+    z.object({ id: z.string().uuid(), content: z.string().min(3).max(600) }).parse(d),
+  )
   .handler(async ({ data, context }) => {
     try {
       return { ok: true as const, ...(await editMemory(context.supabase, data.id, data.content)) };
