@@ -8,7 +8,8 @@ function tzOffset(t: number, tz: string) {
       .formatToParts(new Date(t))
       .map((x) => [x.type, x.value]),
   );
-  return Date.UTC(+p.year!, +p.month! - 1, +p.day!, +p.hour!, +p.minute!, +p.second!) - Math.floor(t / 1000) * 1000;
+  const n = (k: string) => Number(p[k]);
+  return Date.UTC(n("year"), n("month") - 1, n("day"), n("hour"), n("minute"), n("second")) - Math.floor(t / 1000) * 1000;
 }
 
 /** The instant of local midnight at the start of `date` (YYYY-MM-DD) in `tz`, DST-safe. */
