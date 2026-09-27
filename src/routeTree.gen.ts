@@ -17,6 +17,8 @@ import { Route as AuthenticatedInsightsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedJournalRouteImport } from './routes/_authenticated/journal'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedEntriesEntryIdRouteImport } from './routes/_authenticated/entries.$entryId'
+import { Route as AuthenticatedWriteSessionIdRouteImport } from './routes/_authenticated/write.$sessionId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -57,6 +59,18 @@ const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedEntriesEntryIdRoute =
+  AuthenticatedEntriesEntryIdRouteImport.update({
+    id: '/entries/$entryId',
+    path: '/entries/$entryId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedWriteSessionIdRoute =
+  AuthenticatedWriteSessionIdRouteImport.update({
+    id: '/write/$sessionId',
+    path: '/write/$sessionId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -66,6 +80,8 @@ export interface FileRoutesByFullPath {
   '/journal': typeof AuthenticatedJournalRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/entries/$entryId': typeof AuthenticatedEntriesEntryIdRoute
+  '/write/$sessionId': typeof AuthenticatedWriteSessionIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -75,6 +91,8 @@ export interface FileRoutesByTo {
   '/journal': typeof AuthenticatedJournalRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/entries/$entryId': typeof AuthenticatedEntriesEntryIdRoute
+  '/write/$sessionId': typeof AuthenticatedWriteSessionIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -86,6 +104,8 @@ export interface FileRoutesById {
   '/_authenticated/journal': typeof AuthenticatedJournalRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/entries/$entryId': typeof AuthenticatedEntriesEntryIdRoute
+  '/_authenticated/write/$sessionId': typeof AuthenticatedWriteSessionIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -97,6 +117,8 @@ export interface FileRouteTypes {
     | '/journal'
     | '/onboarding'
     | '/settings'
+    | '/entries/$entryId'
+    | '/write/$sessionId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -106,6 +128,8 @@ export interface FileRouteTypes {
     | '/journal'
     | '/onboarding'
     | '/settings'
+    | '/entries/$entryId'
+    | '/write/$sessionId'
   id:
     | '__root__'
     | '/'
@@ -116,6 +140,8 @@ export interface FileRouteTypes {
     | '/_authenticated/journal'
     | '/_authenticated/onboarding'
     | '/_authenticated/settings'
+    | '/_authenticated/entries/$entryId'
+    | '/_authenticated/write/$sessionId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -182,6 +208,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/entries/$entryId': {
+      id: '/_authenticated/entries/$entryId'
+      path: '/entries/$entryId'
+      fullPath: '/entries/$entryId'
+      preLoaderRoute: typeof AuthenticatedEntriesEntryIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/write/$sessionId': {
+      id: '/_authenticated/write/$sessionId'
+      path: '/write/$sessionId'
+      fullPath: '/write/$sessionId'
+      preLoaderRoute: typeof AuthenticatedWriteSessionIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -191,6 +231,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedJournalRoute: typeof AuthenticatedJournalRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedEntriesEntryIdRoute: typeof AuthenticatedEntriesEntryIdRoute
+  AuthenticatedWriteSessionIdRoute: typeof AuthenticatedWriteSessionIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -199,6 +241,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedJournalRoute: AuthenticatedJournalRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedEntriesEntryIdRoute: AuthenticatedEntriesEntryIdRoute,
+  AuthenticatedWriteSessionIdRoute: AuthenticatedWriteSessionIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
