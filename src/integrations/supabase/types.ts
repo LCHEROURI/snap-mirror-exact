@@ -509,42 +509,63 @@ export type Database = {
       profiles: {
         Row: {
           ai_memory_enabled: boolean
+          auto_play_responses: boolean
           created_at: string
           display_name: string | null
+          first_name: string | null
           id: string
           journaling_intention: string | null
           onboarded_at: string | null
+          preferred_interaction: string
+          reflection_reminders_enabled: boolean
           reflection_style: string | null
           reminder_preference: string
+          theme: string
           timezone: string | null
           updated_at: string
           voice_enabled: boolean
+          voice_name: string | null
+          weekly_report_enabled: boolean
         }
         Insert: {
           ai_memory_enabled?: boolean
+          auto_play_responses?: boolean
           created_at?: string
           display_name?: string | null
+          first_name?: string | null
           id: string
           journaling_intention?: string | null
           onboarded_at?: string | null
+          preferred_interaction?: string
+          reflection_reminders_enabled?: boolean
           reflection_style?: string | null
           reminder_preference?: string
+          theme?: string
           timezone?: string | null
           updated_at?: string
           voice_enabled?: boolean
+          voice_name?: string | null
+          weekly_report_enabled?: boolean
         }
         Update: {
           ai_memory_enabled?: boolean
+          auto_play_responses?: boolean
           created_at?: string
           display_name?: string | null
+          first_name?: string | null
           id?: string
           journaling_intention?: string | null
           onboarded_at?: string | null
+          preferred_interaction?: string
+          reflection_reminders_enabled?: boolean
           reflection_style?: string | null
           reminder_preference?: string
+          theme?: string
           timezone?: string | null
           updated_at?: string
           voice_enabled?: boolean
+          voice_name?: string | null
+          weekly_report_enabled?: boolean
         }
         Relationships: []
       }
@@ -780,6 +801,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      delete_all_memories: { Args: never; Returns: undefined }
+      delete_all_personal_data: { Args: never; Returns: undefined }
+      delete_journal_entry: { Args: { p_entry_id: string }; Returns: undefined }
+      delete_journal_history: { Args: never; Returns: undefined }
       match_entries: {
         Args: {
           from_ts?: string
