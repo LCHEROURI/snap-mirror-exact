@@ -79,58 +79,6 @@ export async function setSessionStatus(sessionId: string, status: "active" | "pa
   if (error) throw error;
 }
 
-/** Deterministic, non-AI metadata for development. Phase 3 replaces title/summary with AI analysis. */
-export function deriveEntryMetadata(messages: JournalMessage[]) {
-  const userText = messages.filter((m) => m.role === "user").map((m) => m.content.trim());
-  const first = userText[0] ?? "";
-  const firstLine = first.split(/[.!?\n]/)[0]?.trim() ?? "";
-  const title = firstLine ? (firstLine.length > 60 ? firstLine.slice(0, 57) + "…" : firstLine) : "Untitled reflection";
-  const joined = userText.join(" ");
-  const preview = joined.length > 180 ? joined.slice(0, 177) + "…" : joined;
-  const word_count = joined.split(/\s+/).filter(Boolean).length;
-  return { title, preview, word_count, message_count: messages.length };
-}
-
-export async function finishSession(sessionId: string) {
-  const user_id = await currentUserId();
-  const session = await fetchSession(sessionId);
-  if (!session) throw new Error("Session not found");
-  const messages = await fetchMessages(sessionId);
-  if (!messages.some((m) => m.role === "user")) throw new Error("Write something before finishing");
-
-  const { data: existing } = await supabase
-    .from("journal_entries")
-    .select("id")
-    .eq("session_id", sessionId)
-    .maybeSingle();
-
-  const now = new Date().toISOString();
-  let entryId = existing?.id;
-  if (!entryId) {
-    const meta = deriveEntryMetadata(messages);
-    const { data, error } = await supabase
-      .from("journal_entries")
-      .insert({
-        user_id,
-        session_id: sessionId,
-        session_type: session.session_type,
-        started_at: session.started_at,
-        completed_at: now,
-        ...meta,
-      })
-      .select("id")
-      .single();
-    if (error) throw error;
-    entryId = data.id;
-  }
-  const { error } = await supabase
-    .from("journal_sessions")
-    .update({ status: "completed", ended_at: now })
-    .eq("id", sessionId);
-  if (error) throw error;
-  return entryId;
-}
-
 export type EntryFilters = { search?: string; range?: "all" | "7d" | "30d" | "year" };
 
 export async function fetchEntries(filters: EntryFilters = {}) {
@@ -140,7 +88,7 @@ export async function fetchEntries(filters: EntryFilters = {}) {
     .order("started_at", { ascending: false })
     .limit(200);
   const s = filters.search?.trim().replace(/[%,()]/g, " ");
-  if (s) q = q.or(`title.ilike.%${s}%,preview.ilike.%${s}%`);
+  if (s) q = q.or(`title.ilike.%${s}%,preview.ilike.%${s}%,summary.ilike.%${s}%`);
   if (filters.range && filters.range !== "all") {
     const d = new Date();
     if (filters.range === "7d") d.setDate(d.getDate() - 7);
@@ -156,7 +104,7 @@ export async function fetchEntries(filters: EntryFilters = {}) {
 export async function fetchEntry(id: string) {
   const { data, error } = await supabase
     .from("journal_entries")
-    .select("id, title, preview, session_type, mood_score, started_at, completed_at, session_id, word_count")
+    .select("id, title, preview, summary, narrative, analysis, analysis_status, analysis_error, session_type, mood_score, started_at, completed_at, session_id, word_count")
     .eq("id", id)
     .maybeSingle();
   if (error) throw error;
