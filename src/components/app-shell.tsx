@@ -1,6 +1,9 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { BookOpen, CalendarDays, Flag, Mic, MessageCircleQuestion, Sparkles, Settings } from "lucide-react";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { profileQueryOptions } from "@/lib/profile";
+import { applyTheme, currentTheme, type ThemePref } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -23,6 +26,12 @@ const MOBILE_NAV = [
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  // The saved account theme wins over this device's cached choice (e.g. after signing in on a new device).
+  const { data: profile } = useQuery(profileQueryOptions);
+  useEffect(() => {
+    const t = profile?.theme as ThemePref | undefined;
+    if (t && t !== currentTheme()) applyTheme(t);
+  }, [profile?.theme]);
 
   return (
     <div className="min-h-screen bg-background sm:flex">
