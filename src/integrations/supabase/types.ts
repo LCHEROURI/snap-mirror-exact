@@ -822,6 +822,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      clear_my_ai_usage: { Args: never; Returns: undefined }
       consume_ai_quota: {
         Args: { p_kind: string; p_limit: number; p_window_seconds: number }
         Returns: boolean
