@@ -6,6 +6,7 @@ export function aiConfig() {
     apiKey,
     baseURL: "https://ai.gateway.lovable.dev/v1",
     chatModel: process.env["JOURNAL_CHAT_MODEL"] || "openai/gpt-6-astra",
+    askModel: process.env["ASK_JOURNAL_MODEL"] || "openai/gpt-6-astra",
     analysisModel: process.env["JOURNAL_ANALYSIS_MODEL"] || "openai/gpt-6-astra",
   };
 }

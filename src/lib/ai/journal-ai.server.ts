@@ -8,6 +8,7 @@ import { SAFETY_RESPONSE, needsSafetyResponse } from "./safety.server";
 import { analysisWireSchema, validateAnalysis } from "./analysis";
 import { PLACEHOLDER_PREFIX } from "../companion/types";
 import { retrieveMemories, saveEntryMemories, retryPendingEmbeddings } from "./memory.server";
+import { embedEntrySummary } from "./ask.server";
 
 type Db = SupabaseClient<Database>;
 
@@ -229,6 +230,7 @@ export async function analyzeEntry(db: Db, entryId: string): Promise<{ ok: boole
       .eq("id", entryId);
     if (uErr) throw uErr;
     // Memory pipeline runs after the entry is safely saved; it never fails the entry.
+    await embedEntrySummary(db, entryId, `${a.title}. ${a.summary} ${a.topics.join(", ")}`);
     await retryPendingEmbeddings(db, 10).catch(() => 0);
     const memoryStats = await saveEntryMemories(db, entry.user_id, entryId, a.memory_candidates);
     console.info("[memory] saved", memoryStats);
