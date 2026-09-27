@@ -1,11 +1,11 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Check, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { entryCountQueryOptions } from "@/lib/journal";
+import { createSession, entryCountQueryOptions } from "@/lib/journal";
 import { profileQueryOptions } from "@/lib/profile";
 import { cn } from "@/lib/utils";
 
@@ -25,6 +25,8 @@ export function FirstReflectionCard({ entryId }: { entryId: string }) {
   const [reminder, setReminder] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [starting, setStarting] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setDismissed(localStorage.getItem(dismissKey) === "1");
@@ -36,6 +38,19 @@ export function FirstReflectionCard({ entryId }: { entryId: string }) {
     localStorage.setItem(dismissKey, "1");
     setDismissed(true);
   };
+
+  async function reflectAgain() {
+    if (starting) return;
+    setStarting(true);
+    try {
+      const id = await createSession("text");
+      dismiss();
+      navigate({ to: "/write/$sessionId", params: { sessionId: id } });
+    } catch {
+      toast.error("Couldn't start your reflection. Try again.");
+      setStarting(false);
+    }
+  }
 
   async function saveReminder() {
     if (!reminder || !profile || saving) return;
@@ -71,8 +86,9 @@ export function FirstReflectionCard({ entryId }: { entryId: string }) {
         <Button asChild onClick={dismiss}>
           <Link to="/journal">Go to my journal</Link>
         </Button>
-        <Button variant="outline" asChild onClick={dismiss}>
-          <Link to="/journal">Reflect again</Link>
+        <Button variant="outline" onClick={reflectAgain} disabled={starting}>
+          {starting && <Loader2 className="size-4 animate-spin" />}
+          Reflect again
         </Button>
       </div>
 
