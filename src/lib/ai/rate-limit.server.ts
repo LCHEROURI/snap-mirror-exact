@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
 
 // Per-user limits on expensive AI calls. Counts live in ai_usage (RLS-scoped to the caller).
 export const LIMITS = {
@@ -20,7 +21,10 @@ export const RATE_LIMITED = {
 };
 
 /** true = allowed. Fails open on database errors so journaling is never blocked by the limiter itself. */
-export async function allowAi(supabase: SupabaseClient<any>, kind: QuotaKind): Promise<boolean> {
+export async function allowAi(
+  supabase: SupabaseClient<Database>,
+  kind: QuotaKind,
+): Promise<boolean> {
   const { limit, windowSec } = LIMITS[kind];
   const { data, error } = await supabase.rpc("consume_ai_quota", {
     p_kind: kind,

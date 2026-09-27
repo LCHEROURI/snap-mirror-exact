@@ -74,7 +74,12 @@ describe("finishSession and the analysis quota", () => {
 
   it("saves the entry and skips analysis when the quota is exhausted", async () => {
     const db = fakeDb();
-    const r = await finishSession(db as unknown as Parameters<typeof finishSession>[0], "u1", "s1", async () => false);
+    const r = await finishSession(
+      db as unknown as Parameters<typeof finishSession>[0],
+      "u1",
+      "s1",
+      async () => false,
+    );
     expect(db.inserts).toContain("journal_entries");
     expect(r).toEqual({ entryId: "e1", analysisOk: false, analysisDeferred: true });
     expect(generateObject).not.toHaveBeenCalled();
@@ -82,7 +87,12 @@ describe("finishSession and the analysis quota", () => {
 
   it("runs analysis when the quota allows it", async () => {
     const db = fakeDb();
-    const r = await finishSession(db as unknown as Parameters<typeof finishSession>[0], "u1", "s1", async () => true);
+    const r = await finishSession(
+      db as unknown as Parameters<typeof finishSession>[0],
+      "u1",
+      "s1",
+      async () => true,
+    );
     expect(db.inserts).toContain("journal_entries");
     expect(generateObject).toHaveBeenCalledTimes(1);
     expect(r.analysisDeferred).toBe(false);
