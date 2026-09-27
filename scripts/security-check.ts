@@ -1,6 +1,10 @@
 import { createClient } from "@supabase/supabase-js";
-const URL = process.env.SUPABASE_URL!, PK = "sb_publishable_yQRq8a4YN_dh1FdyJv4W_g_f3RDdf67";
-const admin = createClient(URL, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } });
+const URL = process.env.SUPABASE_URL, PK = process.env.SUPABASE_PUBLISHABLE_KEY, SRK = process.env.SUPABASE_SERVICE_ROLE_KEY;
+if (!URL || !PK || !SRK) {
+  console.error("Missing SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY or SUPABASE_SERVICE_ROLE_KEY in the environment.");
+  process.exit(1);
+}
+const admin = createClient(URL, SRK, { auth: { persistSession: false } });
 let pass = 0, failN = 0;
 const ok = (c: boolean, m: string) => { c ? pass++ : failN++; console.log(c ? "PASS" : "FAIL", m); };
 async function user(tag: string) {
@@ -27,7 +31,7 @@ try {
 
   const tables = ["profiles","journal_sessions","journal_messages","journal_entries","memories","topics","entry_topics","people","entry_people","goals","goal_checkins","mood_entries","weekly_reports","session_summaries","ai_usage"];
   for (const t of tables) {
-    const r = await A.c.from(t).select("*").neq("user_id" in {} ? "x" : (t === "profiles" ? "id" : "user_id"), A.id);
+    const r = await A.c.from(t).select("*").neq(t === "profiles" ? "id" : "user_id", A.id);
     ok(!r.error ? r.data!.length === 0 : true, `A reads no B rows in ${t}`);
   }
   // Writes against B's ids
@@ -69,6 +73,21 @@ try {
   let last = true;
   for (let i = 0; i < 4; i++) last = (await A.c.rpc("consume_ai_quota", { p_kind: "t", p_limit: 3, p_window_seconds: 60 })).data as boolean;
   ok(last === false, "quota blocks the 4th call when limit is 3");
+  // Bypass attempts: user must not be able to clear or forge their own usage rows
+  const count = async () => (await admin.from("ai_usage").select("id", { count: "exact", head: true }).eq("user_id", A.id)).count ?? 0;
+  const before = await count();
+  await A.c.from("ai_usage").delete().eq("user_id", A.id);
+  ok((await count()) === before && before > 0, "A cannot delete own usage rows");
+  const after = (await A.c.rpc("consume_ai_quota", { p_kind: "t", p_limit: 3, p_window_seconds: 60 })).data;
+  ok(after === false, "quota still blocks after delete attempt");
+  const ins = await A.c.from("ai_usage").insert({ kind: "chat", user_id: A.id });
+  ok(!!ins.error, "A cannot insert own usage rows directly");
+  const big = await A.c.rpc("consume_ai_quota", { p_kind: "chat", p_limit: 100000, p_window_seconds: 60 });
+  ok(!!big.error, "quota rejects oversized limit");
+  const wk = await A.c.rpc("consume_ai_quota", { p_kind: "made_up", p_limit: 5, p_window_seconds: 60 });
+  ok(!!wk.error, "quota rejects unknown kind");
+  const del = await A.c.rpc("delete_all_personal_data");
+  ok(!del.error && (await count()) === 0, "delete_all_personal_data clears own usage " + (del.error?.message ?? ""));
 } finally {
   for (const u of [A, B]) { await u.c.rpc("delete_all_personal_data"); await admin.from("profiles").delete().eq("id", u.id); await admin.auth.admin.deleteUser(u.id); }
   console.log(`\n${pass} passed, ${failN} failed`);
