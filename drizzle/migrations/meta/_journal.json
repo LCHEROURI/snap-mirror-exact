@@ -36,6 +36,13 @@
       "when": 1790519486431,
       "tag": "0004_phase5_entry_embeddings",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1790519933129,
+      "tag": "0005_phase6_goals_topics_people_mood",
+      "breakpoints": true
     }
   ]
 }
