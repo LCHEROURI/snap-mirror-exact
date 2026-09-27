@@ -84,7 +84,7 @@ export type AskResult = {
   answer: string;
   confidence: "high" | "medium" | "low";
   related_entries: { entry_id: string; title: string; date: string; reason: string }[];
-  range?: string;
+  range?: string | undefined;
 };
 
 export class AskError extends Error {
