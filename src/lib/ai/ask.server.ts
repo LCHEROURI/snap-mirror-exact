@@ -4,6 +4,7 @@ import type { Database } from "@/integrations/supabase/types";
 import { aiConfig } from "./config.server";
 import { AiError, generateObject } from "./gateway.server";
 import { embedTexts, memoryEnabled } from "./memory.server";
+import { parseRange } from "../ask-range";
 
 type Db = SupabaseClient<Database>;
 
@@ -75,7 +76,8 @@ export async function askJournal(db: Db, userId: string, question: string): Prom
   const { count: total } = await db.from("journal_entries").select("id", { count: "exact", head: true });
   if (!total) throw new AskError("no_history", "Your journal needs a little history before you can ask questions across it.");
 
-  const range = parseRange(q);
+  const { data: prof } = await db.from("profiles").select("timezone").eq("id", userId).maybeSingle();
+  const range = parseRange(q, prof?.timezone);
   await backfillEntries(db).catch(() => undefined);
 
   let qv: number[];
