@@ -513,6 +513,7 @@ export type Database = {
           onboarded_at: string | null
           reflection_style: string | null
           reminder_preference: string
+          timezone: string | null
           updated_at: string
         }
         Insert: {
@@ -524,6 +525,7 @@ export type Database = {
           onboarded_at?: string | null
           reflection_style?: string | null
           reminder_preference?: string
+          timezone?: string | null
           updated_at?: string
         }
         Update: {
@@ -535,6 +537,7 @@ export type Database = {
           onboarded_at?: string | null
           reflection_style?: string | null
           reminder_preference?: string
+          timezone?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -708,25 +711,61 @@ export type Database = {
       }
       weekly_reports: {
         Row: {
+          challenges: Json
           content: Json
           created_at: string
+          decisions: Json
+          entry_count: number
+          goal_progress: Json
           id: string
+          next_week: Json
+          patterns: Json
+          summary: string | null
+          themes: Json
+          updated_at: string
           user_id: string
+          week_end: string | null
           week_start: string
+          wins: Json
+          worth_noticing: string | null
         }
         Insert: {
+          challenges?: Json
           content?: Json
           created_at?: string
+          decisions?: Json
+          entry_count?: number
+          goal_progress?: Json
           id?: string
-          user_id: string
+          next_week?: Json
+          patterns?: Json
+          summary?: string | null
+          themes?: Json
+          updated_at?: string
+          user_id?: string
+          week_end?: string | null
           week_start: string
+          wins?: Json
+          worth_noticing?: string | null
         }
         Update: {
+          challenges?: Json
           content?: Json
           created_at?: string
+          decisions?: Json
+          entry_count?: number
+          goal_progress?: Json
           id?: string
+          next_week?: Json
+          patterns?: Json
+          summary?: string | null
+          themes?: Json
+          updated_at?: string
           user_id?: string
+          week_end?: string | null
           week_start?: string
+          wins?: Json
+          worth_noticing?: string | null
         }
         Relationships: []
       }
