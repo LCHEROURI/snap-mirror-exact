@@ -1359,3 +1359,4 @@ Create an original product named Reflective.
 - Unsent reflection drafts are kept in localStorage per session and cleared on send; after a network error the transcript is re-read to avoid duplicate sends.
 - `ai_usage` is written only by the SECURITY DEFINER `consume_ai_quota` (kind whitelist, capped limits); users can read but not insert/delete rows, so quotas can't be reset. Finishing always saves; analysis on finish obeys the `analysis` quota and is deferred (`pending`) when exhausted.
 - Ask My Journal date phrases resolve in `profiles.timezone` via `src/lib/ask-range.ts` (DST-safe local midnights, UTC fallback).
+- Onboarding ends by starting the first reflection (Write → createSession → /write, Talk → existing /voice); reminder choice is asked only after the first saved entry (`first-reflection-card.tsx`). Product events go through the no-op `src/lib/product-events.ts` (no content, no provider yet).
