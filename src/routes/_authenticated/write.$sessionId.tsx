@@ -7,15 +7,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { MessageBubble } from "@/components/message-bubble";
-import {
-  addUserMessage,
-  fetchMessages,
-  fetchSession,
-  finishSession,
-  setSessionStatus,
-  type JournalMessage,
-} from "@/lib/journal";
-import { requestCompanionReply } from "@/lib/companion.functions";
+import { fetchMessages, fetchSession, setSessionStatus, type JournalMessage } from "@/lib/journal";
+import { finishJournalSession, retryJournalReply, sendJournalMessage } from "@/lib/companion.functions";
 
 export const Route = createFileRoute("/_authenticated/write/$sessionId")({
   head: () => ({
@@ -33,7 +26,11 @@ function WriteSession() {
   const { sessionId } = Route.useParams();
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const reply = useServerFn(requestCompanionReply);
+  const sendFn = useServerFn(sendJournalMessage);
+  const retryFn = useServerFn(retryJournalReply);
+  const finishFn = useServerFn(finishJournalSession);
+  const busyRef = useRef(false);
+  const [replyError, setReplyError] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
   const [finishing, setFinishing] = useState(false);
@@ -54,17 +51,42 @@ function WriteSession() {
 
   async function send() {
     const text = draft.trim();
-    if (!text || sending) return;
+    if (!text || busyRef.current) return; // duplicate-send guard
+    busyRef.current = true;
     setSending(true);
+    setReplyError(null);
     try {
-      const saved = await addUserMessage(sessionId, text);
-      append(saved);
-      setDraft("");
-      const res = await reply({ data: { sessionId } });
-      append(res.message);
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Couldn't send. Try again.");
+      const res = await sendFn({ data: { sessionId, message: text } });
+      if (res.ok) {
+        append(res.userMessage);
+        append(res.assistantMessage);
+        setDraft("");
+      } else {
+        if (res.code === "ai") setDraft("");
+        setReplyError(res.error);
+        await messages.refetch();
+      }
+    } catch {
+      setReplyError("Connection problem. Check your internet and try again.");
     } finally {
+      busyRef.current = false;
+      setSending(false);
+    }
+  }
+
+  async function retry() {
+    if (busyRef.current) return;
+    busyRef.current = true;
+    setSending(true);
+    setReplyError(null);
+    try {
+      const res = await retryFn({ data: { sessionId } });
+      if (res.ok) append(res.assistantMessage);
+      else setReplyError(res.error);
+    } catch {
+      setReplyError("Connection problem. Check your internet and try again.");
+    } finally {
+      busyRef.current = false;
       setSending(false);
     }
   }
@@ -79,13 +101,18 @@ function WriteSession() {
   }
 
   async function finish() {
+    if (busyRef.current) return;
+    busyRef.current = true;
     setFinishing(true);
     try {
-      const entryId = await finishSession(sessionId);
+      const res = await finishFn({ data: { sessionId } });
+      if (!res.ok) throw new Error(res.error);
       qc.invalidateQueries();
-      navigate({ to: "/entries/$entryId", params: { entryId } });
+      if (!res.analysisOk) toast.message("Entry saved. The reflection summary couldn't be created — you can retry on the entry page.");
+      navigate({ to: "/entries/$entryId", params: { entryId: res.entryId } });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Couldn't finish. Try again.");
+      busyRef.current = false;
       setFinishing(false);
     }
   }
@@ -136,9 +163,6 @@ function WriteSession() {
         )}
       </header>
 
-      <div className="mx-auto w-full max-w-2xl border-b border-dashed border-border px-5 py-2 text-center text-[0.7rem] text-muted-foreground">
-        Development preview: companion replies are fixed placeholder text, not AI.
-      </div>
 
       <div className="flex-1 overflow-y-auto">
         <ol className="mx-auto flex max-w-2xl flex-col gap-4 px-4 py-6 sm:px-6" aria-live="polite">
@@ -152,7 +176,27 @@ function WriteSession() {
             <MessageBubble key={m.id} m={m} />
           ))}
           {sending && (
-            <li className="text-sm text-muted-foreground"><Loader2 className="inline size-4 animate-spin" /> …</li>
+            <li className="flex items-center gap-2 text-sm text-muted-foreground" role="status">
+              <span className="inline-flex gap-1" aria-hidden>
+                <span className="size-1.5 animate-pulse rounded-full bg-muted-foreground" />
+                <span className="size-1.5 animate-pulse rounded-full bg-muted-foreground [animation-delay:150ms]" />
+                <span className="size-1.5 animate-pulse rounded-full bg-muted-foreground [animation-delay:300ms]" />
+              </span>
+              <span className="sr-only">Companion is thinking</span>
+            </li>
+          )}
+          {finishing && (
+            <li className="text-center text-sm text-muted-foreground" role="status">
+              <Loader2 className="mr-2 inline size-4 animate-spin" />Saving and reflecting on your entry…
+            </li>
+          )}
+          {replyError && !sending && (
+            <li className="rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm" role="alert">
+              <p>{replyError}</p>
+              {list[list.length - 1]?.role === "user" && (
+                <Button size="sm" variant="outline" className="mt-2" onClick={retry}>Ask again</Button>
+              )}
+            </li>
           )}
           <div ref={bottomRef} />
         </ol>
@@ -176,7 +220,7 @@ function WriteSession() {
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
               placeholder={paused ? "Paused — resume to keep writing" : "Write what's on your mind…"}
-              disabled={paused || sending}
+              disabled={paused || sending || finishing}
               rows={1}
               className="max-h-40 min-h-11 resize-none bg-background"
               aria-label="Your message"
