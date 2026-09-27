@@ -49,7 +49,8 @@ export const retryEntryAnalysis = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ entryId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     try {
-      return { ok: true as const, ...(await analyzeEntry(context.supabase, data.entryId)) };
+      const r = await analyzeEntry(context.supabase, data.entryId);
+      return { ok: true as const, analysisOk: r.ok };
     } catch (e) {
       return fail(e);
     }

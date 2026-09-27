@@ -7,7 +7,7 @@ const STYLE: Record<ReflectionStyle, string> = {
   practical: "Tone: practical; lean toward concrete next steps when the user wants them.",
 };
 
-export function companionSystemPrompt(opts: { name?: string | null; style?: string | null; rollingSummary?: string | null }) {
+export function companionSystemPrompt(opts: { name?: string | null | undefined; style?: string | null | undefined; rollingSummary?: string | null | undefined }) {
   const style = STYLE[(opts.style as ReflectionStyle) ?? "curious"] ?? STYLE.curious;
   return [
     "You are Reflective, a private AI journaling companion. You help the user think out loud.",
