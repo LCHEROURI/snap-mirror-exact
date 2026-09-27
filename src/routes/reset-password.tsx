@@ -38,7 +38,7 @@ function ResetPassword() {
     setBusy(true);
     const { error } = await supabase.auth.updateUser({ password: pw });
     setBusy(false);
-    if (error) return toast.error(error.message || "Couldn't update your password.");
+    if (error) { toast.error(error.message || "Couldn't update your password."); return; }
     toast.success("Password updated.");
     navigate({ to: "/journal" });
   }

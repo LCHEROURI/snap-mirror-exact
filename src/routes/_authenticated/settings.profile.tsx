@@ -44,7 +44,7 @@ function ProfileSettings() {
     setEmailBusy(true);
     const { error } = await supabase.auth.updateUser({ email: email.trim() }, { emailRedirectTo: `${window.location.origin}/auth` });
     setEmailBusy(false);
-    if (error) return toast.error(error.message || "Couldn't start the email change.");
+    if (error) { toast.error(error.message || "Couldn't start the email change."); return; }
     toast.success("Check both inboxes to confirm the change. Your email stays the same until you do.");
     setEmail("");
   }
