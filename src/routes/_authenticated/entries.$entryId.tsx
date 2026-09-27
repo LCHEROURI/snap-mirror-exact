@@ -13,6 +13,7 @@ import {
 import { deleteEntry, fetchEntry, fetchMessages, formatDate, renameEntry } from "@/lib/journal";
 import { MessageBubble } from "@/components/message-bubble";
 import { EntryAnalysis } from "@/components/entry-analysis";
+import { EntryTracking } from "@/components/entry-tracking";
 import type { JournalAnalysis } from "@/lib/ai/analysis";
 
 export const Route = createFileRoute("/_authenticated/entries/$entryId")({
@@ -122,6 +123,13 @@ function EntryDetail() {
               analysis={entry.data.analysis as unknown as JournalAnalysis | null}
               onUpdated={() => { entry.refetch(); qc.invalidateQueries({ queryKey: ["entries"] }); }}
             />
+            {entry.data.analysis_status === "complete" && (
+              <EntryTracking
+                entryId={entryId}
+                analysis={entry.data.analysis as unknown as JournalAnalysis | null}
+                dismissed={entry.data.dismissed_goal_candidates ?? []}
+              />
+            )}
 
             <section className="mt-10">
               <h2 className="font-serif text-lg">Transcript</h2>
