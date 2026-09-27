@@ -109,7 +109,7 @@ export class TurnVoiceProvider implements VoiceProvider {
   }
 
   private async play(messageId: string) {
-    if (this.muted === undefined || this.stopped) return;
+    if (this.stopped) return;
     const s = await this.deps.speak(messageId).catch(() => null);
     if (this.stopped) return;
     if (!s || !s.ok) { this.ev.onError("playback", s && !s.ok ? s.error : ""); return; }
