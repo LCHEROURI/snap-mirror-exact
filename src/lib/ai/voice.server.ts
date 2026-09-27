@@ -75,6 +75,8 @@ export async function speakMessage(db: Db, messageId: string) {
   if (!m || m.role !== "assistant") throw new JournalError("not_found", "Nothing to play.");
   const cfg = voiceConfig();
   const ai = aiConfig();
+  const { data: pref } = await db.from("profiles").select("voice_name").maybeSingle();
+  const voiceName = pref?.voice_name || cfg.ttsVoice;
   const text = m.content.slice(0, 1200);
   const res = await fetch(`${ai.baseURL}/audio/speech`, {
     method: "POST",
@@ -82,7 +84,7 @@ export async function speakMessage(db: Db, messageId: string) {
     body: JSON.stringify({
       model: cfg.ttsModel,
       contents: [{ role: "user", parts: [{ text: `Say calmly and warmly, at an unhurried pace: ${text}` }] }],
-      generationConfig: { responseModalities: ["AUDIO"], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: cfg.ttsVoice } } } },
+      generationConfig: { responseModalities: ["AUDIO"], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName } } } },
       stream_format: "audio",
     }),
   });

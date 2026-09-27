@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAskRouteImport } from './routes/_authenticated/ask'
 import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated/history'
 import { Route as AuthenticatedInsightsRouteImport } from './routes/_authenticated/insights'
@@ -26,6 +27,15 @@ import { Route as AuthenticatedPeopleIndexRouteImport } from './routes/_authenti
 import { Route as AuthenticatedPeoplePersonIdRouteImport } from './routes/_authenticated/people.$personId'
 import { Route as AuthenticatedReportsIndexRouteImport } from './routes/_authenticated/reports.index'
 import { Route as AuthenticatedReportsWeekStartRouteImport } from './routes/_authenticated/reports.$weekStart'
+import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings.index'
+import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings.account'
+import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_authenticated/settings.appearance'
+import { Route as AuthenticatedSettingsMemoryRouteImport } from './routes/_authenticated/settings.memory'
+import { Route as AuthenticatedSettingsNotificationsRouteImport } from './routes/_authenticated/settings.notifications'
+import { Route as AuthenticatedSettingsPrivacyRouteImport } from './routes/_authenticated/settings.privacy'
+import { Route as AuthenticatedSettingsProfileRouteImport } from './routes/_authenticated/settings.profile'
+import { Route as AuthenticatedSettingsReflectionRouteImport } from './routes/_authenticated/settings.reflection'
+import { Route as AuthenticatedSettingsVoiceRouteImport } from './routes/_authenticated/settings.voice'
 import { Route as AuthenticatedTopicsIndexRouteImport } from './routes/_authenticated/topics.index'
 import { Route as AuthenticatedTopicsTopicIdRouteImport } from './routes/_authenticated/topics.$topicId'
 import { Route as AuthenticatedVoiceIndexRouteImport } from './routes/_authenticated/voice.index'
@@ -44,6 +54,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAskRoute = AuthenticatedAskRouteImport.update({
@@ -122,6 +137,60 @@ const AuthenticatedReportsWeekStartRoute =
     path: '/reports/$weekStart',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedSettingsIndexRoute =
+  AuthenticatedSettingsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedSettingsRoute,
+  } as any)
+const AuthenticatedSettingsAccountRoute =
+  AuthenticatedSettingsAccountRouteImport.update({
+    id: '/account',
+    path: '/account',
+    getParentRoute: () => AuthenticatedSettingsRoute,
+  } as any)
+const AuthenticatedSettingsAppearanceRoute =
+  AuthenticatedSettingsAppearanceRouteImport.update({
+    id: '/appearance',
+    path: '/appearance',
+    getParentRoute: () => AuthenticatedSettingsRoute,
+  } as any)
+const AuthenticatedSettingsMemoryRoute =
+  AuthenticatedSettingsMemoryRouteImport.update({
+    id: '/memory',
+    path: '/memory',
+    getParentRoute: () => AuthenticatedSettingsRoute,
+  } as any)
+const AuthenticatedSettingsNotificationsRoute =
+  AuthenticatedSettingsNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedSettingsRoute,
+  } as any)
+const AuthenticatedSettingsPrivacyRoute =
+  AuthenticatedSettingsPrivacyRouteImport.update({
+    id: '/privacy',
+    path: '/privacy',
+    getParentRoute: () => AuthenticatedSettingsRoute,
+  } as any)
+const AuthenticatedSettingsProfileRoute =
+  AuthenticatedSettingsProfileRouteImport.update({
+    id: '/profile',
+    path: '/profile',
+    getParentRoute: () => AuthenticatedSettingsRoute,
+  } as any)
+const AuthenticatedSettingsReflectionRoute =
+  AuthenticatedSettingsReflectionRouteImport.update({
+    id: '/reflection',
+    path: '/reflection',
+    getParentRoute: () => AuthenticatedSettingsRoute,
+  } as any)
+const AuthenticatedSettingsVoiceRoute =
+  AuthenticatedSettingsVoiceRouteImport.update({
+    id: '/voice',
+    path: '/voice',
+    getParentRoute: () => AuthenticatedSettingsRoute,
+  } as any)
 const AuthenticatedTopicsIndexRoute =
   AuthenticatedTopicsIndexRouteImport.update({
     id: '/topics/',
@@ -155,46 +224,65 @@ const AuthenticatedWriteSessionIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/ask': typeof AuthenticatedAskRoute
   '/history': typeof AuthenticatedHistoryRoute
   '/insights': typeof AuthenticatedInsightsRoute
   '/journal': typeof AuthenticatedJournalRoute
   '/mood': typeof AuthenticatedMoodRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
-  '/settings': typeof AuthenticatedSettingsRoute
+  '/settings': typeof AuthenticatedSettingsRouteWithChildren
   '/entries/$entryId': typeof AuthenticatedEntriesEntryIdRoute
   '/goals/$goalId': typeof AuthenticatedGoalsGoalIdRoute
   '/people/$personId': typeof AuthenticatedPeoplePersonIdRoute
   '/reports/$weekStart': typeof AuthenticatedReportsWeekStartRoute
+  '/settings/account': typeof AuthenticatedSettingsAccountRoute
+  '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
+  '/settings/memory': typeof AuthenticatedSettingsMemoryRoute
+  '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/settings/privacy': typeof AuthenticatedSettingsPrivacyRoute
+  '/settings/profile': typeof AuthenticatedSettingsProfileRoute
+  '/settings/reflection': typeof AuthenticatedSettingsReflectionRoute
+  '/settings/voice': typeof AuthenticatedSettingsVoiceRoute
   '/topics/$topicId': typeof AuthenticatedTopicsTopicIdRoute
   '/voice/$sessionId': typeof AuthenticatedVoiceSessionIdRoute
   '/write/$sessionId': typeof AuthenticatedWriteSessionIdRoute
   '/goals/': typeof AuthenticatedGoalsIndexRoute
   '/people/': typeof AuthenticatedPeopleIndexRoute
   '/reports/': typeof AuthenticatedReportsIndexRoute
+  '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/topics/': typeof AuthenticatedTopicsIndexRoute
   '/voice/': typeof AuthenticatedVoiceIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/ask': typeof AuthenticatedAskRoute
   '/history': typeof AuthenticatedHistoryRoute
   '/insights': typeof AuthenticatedInsightsRoute
   '/journal': typeof AuthenticatedJournalRoute
   '/mood': typeof AuthenticatedMoodRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
-  '/settings': typeof AuthenticatedSettingsRoute
   '/entries/$entryId': typeof AuthenticatedEntriesEntryIdRoute
   '/goals/$goalId': typeof AuthenticatedGoalsGoalIdRoute
   '/people/$personId': typeof AuthenticatedPeoplePersonIdRoute
   '/reports/$weekStart': typeof AuthenticatedReportsWeekStartRoute
+  '/settings/account': typeof AuthenticatedSettingsAccountRoute
+  '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
+  '/settings/memory': typeof AuthenticatedSettingsMemoryRoute
+  '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/settings/privacy': typeof AuthenticatedSettingsPrivacyRoute
+  '/settings/profile': typeof AuthenticatedSettingsProfileRoute
+  '/settings/reflection': typeof AuthenticatedSettingsReflectionRoute
+  '/settings/voice': typeof AuthenticatedSettingsVoiceRoute
   '/topics/$topicId': typeof AuthenticatedTopicsTopicIdRoute
   '/voice/$sessionId': typeof AuthenticatedVoiceSessionIdRoute
   '/write/$sessionId': typeof AuthenticatedWriteSessionIdRoute
   '/goals': typeof AuthenticatedGoalsIndexRoute
   '/people': typeof AuthenticatedPeopleIndexRoute
   '/reports': typeof AuthenticatedReportsIndexRoute
+  '/settings': typeof AuthenticatedSettingsIndexRoute
   '/topics': typeof AuthenticatedTopicsIndexRoute
   '/voice': typeof AuthenticatedVoiceIndexRoute
 }
@@ -203,23 +291,33 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/ask': typeof AuthenticatedAskRoute
   '/_authenticated/history': typeof AuthenticatedHistoryRoute
   '/_authenticated/insights': typeof AuthenticatedInsightsRoute
   '/_authenticated/journal': typeof AuthenticatedJournalRoute
   '/_authenticated/mood': typeof AuthenticatedMoodRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
-  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRouteWithChildren
   '/_authenticated/entries/$entryId': typeof AuthenticatedEntriesEntryIdRoute
   '/_authenticated/goals/$goalId': typeof AuthenticatedGoalsGoalIdRoute
   '/_authenticated/people/$personId': typeof AuthenticatedPeoplePersonIdRoute
   '/_authenticated/reports/$weekStart': typeof AuthenticatedReportsWeekStartRoute
+  '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
+  '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
+  '/_authenticated/settings/memory': typeof AuthenticatedSettingsMemoryRoute
+  '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/_authenticated/settings/privacy': typeof AuthenticatedSettingsPrivacyRoute
+  '/_authenticated/settings/profile': typeof AuthenticatedSettingsProfileRoute
+  '/_authenticated/settings/reflection': typeof AuthenticatedSettingsReflectionRoute
+  '/_authenticated/settings/voice': typeof AuthenticatedSettingsVoiceRoute
   '/_authenticated/topics/$topicId': typeof AuthenticatedTopicsTopicIdRoute
   '/_authenticated/voice/$sessionId': typeof AuthenticatedVoiceSessionIdRoute
   '/_authenticated/write/$sessionId': typeof AuthenticatedWriteSessionIdRoute
   '/_authenticated/goals/': typeof AuthenticatedGoalsIndexRoute
   '/_authenticated/people/': typeof AuthenticatedPeopleIndexRoute
   '/_authenticated/reports/': typeof AuthenticatedReportsIndexRoute
+  '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/topics/': typeof AuthenticatedTopicsIndexRoute
   '/_authenticated/voice/': typeof AuthenticatedVoiceIndexRoute
 }
@@ -228,6 +326,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/reset-password'
     | '/ask'
     | '/history'
     | '/insights'
@@ -239,35 +338,53 @@ export interface FileRouteTypes {
     | '/goals/$goalId'
     | '/people/$personId'
     | '/reports/$weekStart'
+    | '/settings/account'
+    | '/settings/appearance'
+    | '/settings/memory'
+    | '/settings/notifications'
+    | '/settings/privacy'
+    | '/settings/profile'
+    | '/settings/reflection'
+    | '/settings/voice'
     | '/topics/$topicId'
     | '/voice/$sessionId'
     | '/write/$sessionId'
     | '/goals/'
     | '/people/'
     | '/reports/'
+    | '/settings/'
     | '/topics/'
     | '/voice/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/reset-password'
     | '/ask'
     | '/history'
     | '/insights'
     | '/journal'
     | '/mood'
     | '/onboarding'
-    | '/settings'
     | '/entries/$entryId'
     | '/goals/$goalId'
     | '/people/$personId'
     | '/reports/$weekStart'
+    | '/settings/account'
+    | '/settings/appearance'
+    | '/settings/memory'
+    | '/settings/notifications'
+    | '/settings/privacy'
+    | '/settings/profile'
+    | '/settings/reflection'
+    | '/settings/voice'
     | '/topics/$topicId'
     | '/voice/$sessionId'
     | '/write/$sessionId'
     | '/goals'
     | '/people'
     | '/reports'
+    | '/settings'
     | '/topics'
     | '/voice'
   id:
@@ -275,6 +392,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/reset-password'
     | '/_authenticated/ask'
     | '/_authenticated/history'
     | '/_authenticated/insights'
@@ -286,12 +404,21 @@ export interface FileRouteTypes {
     | '/_authenticated/goals/$goalId'
     | '/_authenticated/people/$personId'
     | '/_authenticated/reports/$weekStart'
+    | '/_authenticated/settings/account'
+    | '/_authenticated/settings/appearance'
+    | '/_authenticated/settings/memory'
+    | '/_authenticated/settings/notifications'
+    | '/_authenticated/settings/privacy'
+    | '/_authenticated/settings/profile'
+    | '/_authenticated/settings/reflection'
+    | '/_authenticated/settings/voice'
     | '/_authenticated/topics/$topicId'
     | '/_authenticated/voice/$sessionId'
     | '/_authenticated/write/$sessionId'
     | '/_authenticated/goals/'
     | '/_authenticated/people/'
     | '/_authenticated/reports/'
+    | '/_authenticated/settings/'
     | '/_authenticated/topics/'
     | '/_authenticated/voice/'
   fileRoutesById: FileRoutesById
@@ -300,6 +427,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -323,6 +451,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/ask': {
@@ -423,6 +558,69 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReportsWeekStartRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/settings/': {
+      id: '/_authenticated/settings/'
+      path: '/'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof AuthenticatedSettingsIndexRouteImport
+      parentRoute: typeof AuthenticatedSettingsRoute
+    }
+    '/_authenticated/settings/account': {
+      id: '/_authenticated/settings/account'
+      path: '/account'
+      fullPath: '/settings/account'
+      preLoaderRoute: typeof AuthenticatedSettingsAccountRouteImport
+      parentRoute: typeof AuthenticatedSettingsRoute
+    }
+    '/_authenticated/settings/appearance': {
+      id: '/_authenticated/settings/appearance'
+      path: '/appearance'
+      fullPath: '/settings/appearance'
+      preLoaderRoute: typeof AuthenticatedSettingsAppearanceRouteImport
+      parentRoute: typeof AuthenticatedSettingsRoute
+    }
+    '/_authenticated/settings/memory': {
+      id: '/_authenticated/settings/memory'
+      path: '/memory'
+      fullPath: '/settings/memory'
+      preLoaderRoute: typeof AuthenticatedSettingsMemoryRouteImport
+      parentRoute: typeof AuthenticatedSettingsRoute
+    }
+    '/_authenticated/settings/notifications': {
+      id: '/_authenticated/settings/notifications'
+      path: '/notifications'
+      fullPath: '/settings/notifications'
+      preLoaderRoute: typeof AuthenticatedSettingsNotificationsRouteImport
+      parentRoute: typeof AuthenticatedSettingsRoute
+    }
+    '/_authenticated/settings/privacy': {
+      id: '/_authenticated/settings/privacy'
+      path: '/privacy'
+      fullPath: '/settings/privacy'
+      preLoaderRoute: typeof AuthenticatedSettingsPrivacyRouteImport
+      parentRoute: typeof AuthenticatedSettingsRoute
+    }
+    '/_authenticated/settings/profile': {
+      id: '/_authenticated/settings/profile'
+      path: '/profile'
+      fullPath: '/settings/profile'
+      preLoaderRoute: typeof AuthenticatedSettingsProfileRouteImport
+      parentRoute: typeof AuthenticatedSettingsRoute
+    }
+    '/_authenticated/settings/reflection': {
+      id: '/_authenticated/settings/reflection'
+      path: '/reflection'
+      fullPath: '/settings/reflection'
+      preLoaderRoute: typeof AuthenticatedSettingsReflectionRouteImport
+      parentRoute: typeof AuthenticatedSettingsRoute
+    }
+    '/_authenticated/settings/voice': {
+      id: '/_authenticated/settings/voice'
+      path: '/voice'
+      fullPath: '/settings/voice'
+      preLoaderRoute: typeof AuthenticatedSettingsVoiceRouteImport
+      parentRoute: typeof AuthenticatedSettingsRoute
+    }
     '/_authenticated/topics/': {
       id: '/_authenticated/topics/'
       path: '/topics'
@@ -461,6 +659,36 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedSettingsRouteChildren {
+  AuthenticatedSettingsAccountRoute: typeof AuthenticatedSettingsAccountRoute
+  AuthenticatedSettingsAppearanceRoute: typeof AuthenticatedSettingsAppearanceRoute
+  AuthenticatedSettingsMemoryRoute: typeof AuthenticatedSettingsMemoryRoute
+  AuthenticatedSettingsNotificationsRoute: typeof AuthenticatedSettingsNotificationsRoute
+  AuthenticatedSettingsPrivacyRoute: typeof AuthenticatedSettingsPrivacyRoute
+  AuthenticatedSettingsProfileRoute: typeof AuthenticatedSettingsProfileRoute
+  AuthenticatedSettingsReflectionRoute: typeof AuthenticatedSettingsReflectionRoute
+  AuthenticatedSettingsVoiceRoute: typeof AuthenticatedSettingsVoiceRoute
+  AuthenticatedSettingsIndexRoute: typeof AuthenticatedSettingsIndexRoute
+}
+
+const AuthenticatedSettingsRouteChildren: AuthenticatedSettingsRouteChildren = {
+  AuthenticatedSettingsAccountRoute: AuthenticatedSettingsAccountRoute,
+  AuthenticatedSettingsAppearanceRoute: AuthenticatedSettingsAppearanceRoute,
+  AuthenticatedSettingsMemoryRoute: AuthenticatedSettingsMemoryRoute,
+  AuthenticatedSettingsNotificationsRoute:
+    AuthenticatedSettingsNotificationsRoute,
+  AuthenticatedSettingsPrivacyRoute: AuthenticatedSettingsPrivacyRoute,
+  AuthenticatedSettingsProfileRoute: AuthenticatedSettingsProfileRoute,
+  AuthenticatedSettingsReflectionRoute: AuthenticatedSettingsReflectionRoute,
+  AuthenticatedSettingsVoiceRoute: AuthenticatedSettingsVoiceRoute,
+  AuthenticatedSettingsIndexRoute: AuthenticatedSettingsIndexRoute,
+}
+
+const AuthenticatedSettingsRouteWithChildren =
+  AuthenticatedSettingsRoute._addFileChildren(
+    AuthenticatedSettingsRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAskRoute: typeof AuthenticatedAskRoute
   AuthenticatedHistoryRoute: typeof AuthenticatedHistoryRoute
@@ -468,7 +696,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedJournalRoute: typeof AuthenticatedJournalRoute
   AuthenticatedMoodRoute: typeof AuthenticatedMoodRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
-  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRouteWithChildren
   AuthenticatedEntriesEntryIdRoute: typeof AuthenticatedEntriesEntryIdRoute
   AuthenticatedGoalsGoalIdRoute: typeof AuthenticatedGoalsGoalIdRoute
   AuthenticatedPeoplePersonIdRoute: typeof AuthenticatedPeoplePersonIdRoute
@@ -490,7 +718,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedJournalRoute: AuthenticatedJournalRoute,
   AuthenticatedMoodRoute: AuthenticatedMoodRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
-  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRouteWithChildren,
   AuthenticatedEntriesEntryIdRoute: AuthenticatedEntriesEntryIdRoute,
   AuthenticatedGoalsGoalIdRoute: AuthenticatedGoalsGoalIdRoute,
   AuthenticatedPeoplePersonIdRoute: AuthenticatedPeoplePersonIdRoute,
@@ -512,6 +740,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

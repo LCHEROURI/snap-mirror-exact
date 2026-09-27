@@ -6,7 +6,7 @@ import { TurnVoiceProvider } from "@/lib/voice/turn-provider";
 import { VOICE_MESSAGES, voiceSupported, type TranscriptLine, type VoiceErrorCode, type VoiceProvider, type VoiceState } from "@/lib/voice/types";
 
 /** Owns the active provider; only one ever runs at a time, and unmount always stops the microphone. */
-export function useVoiceSession(sessionId: string, initial: TranscriptLine[]) {
+export function useVoiceSession(sessionId: string, initial: TranscriptLine[], autoPlay = true) {
   const setupFn = useServerFn(voiceSetup);
   const secretFn = useServerFn(realtimeSession);
   const saveFn = useServerFn(realtimeTurn);
@@ -43,10 +43,11 @@ export function useVoiceSession(sessionId: string, initial: TranscriptLine[]) {
       sendTurn: (audio) => { const fd = new FormData(); fd.append("sessionId", sessionId); fd.append("audio", audio); return turnFn({ data: fd }); },
       speak: (messageId) => speakFn({ data: { messageId } }),
       idleTimeoutSeconds: 120,
+      autoPlay,
     }, events);
     provider.current = p;
     await p.start();
-  }, [sessionId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [sessionId, autoPlay]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const start = useCallback(async () => {
     setError(null);

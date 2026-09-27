@@ -153,7 +153,7 @@ function EntryDetail() {
                   <AlertDialogHeader>
                     <AlertDialogTitle>Delete this entry?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This permanently removes the entry and its transcript. Your other entries and goals are not affected.
+                      This permanently removes the entry, its transcript and any mood check-in saved with it. This can't be undone. Memories, goals, topics and people that came from it are kept.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>

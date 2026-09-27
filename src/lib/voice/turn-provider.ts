@@ -5,6 +5,7 @@ type Deps = {
   sendTurn: (audio: File) => Promise<{ ok: true; userText: string; assistant: { id: string; content: string }; safety: boolean } | { ok: false; code: string; error: string }>;
   speak: (messageId: string) => Promise<{ ok: true; audio: string; mime: string } | { ok: false; code: string; error: string }>;
   idleTimeoutSeconds: number;
+  autoPlay?: boolean;
 };
 
 function encodeWav(chunks: Float32Array[], rate: number) {
@@ -109,7 +110,7 @@ export class TurnVoiceProvider implements VoiceProvider {
   }
 
   private async play(messageId: string) {
-    if (this.stopped) return;
+    if (this.stopped || this.deps.autoPlay === false) return;
     const s = await this.deps.speak(messageId).catch(() => null);
     if (this.stopped) return;
     if (!s || !s.ok) { this.ev.onError("playback", s && !s.ok ? s.error : ""); return; }

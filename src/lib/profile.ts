@@ -7,7 +7,19 @@ export type Profile = {
   reminder_preference: string;
   ai_memory_enabled: boolean;
   onboarded_at: string | null;
+  first_name: string | null;
+  reflection_style: string | null;
+  preferred_interaction: string;
+  timezone: string | null;
+  voice_enabled: boolean;
+  voice_name: string | null;
+  auto_play_responses: boolean;
+  weekly_report_enabled: boolean;
+  reflection_reminders_enabled: boolean;
+  theme: string;
 };
+
+const PROFILE_COLS = "id, display_name, first_name, journaling_intention, reminder_preference, ai_memory_enabled, onboarded_at, reflection_style, preferred_interaction, timezone, voice_enabled, voice_name, auto_play_responses, weekly_report_enabled, reflection_reminders_enabled, theme";
 
 /** Reads the signed-in user's profile, creating the row on first visit. */
 export async function fetchOrCreateProfile(): Promise<Profile | null> {
@@ -17,7 +29,7 @@ export async function fetchOrCreateProfile(): Promise<Profile | null> {
 
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, display_name, journaling_intention, reminder_preference, ai_memory_enabled, onboarded_at")
+    .select(PROFILE_COLS)
     .eq("id", user.id)
     .maybeSingle();
   if (error) throw error;
@@ -31,7 +43,7 @@ export async function fetchOrCreateProfile(): Promise<Profile | null> {
   const { data: created, error: insertError } = await supabase
     .from("profiles")
     .insert({ id: user.id, display_name: suggestedName })
-    .select("id, display_name, journaling_intention, reminder_preference, ai_memory_enabled, onboarded_at")
+    .select(PROFILE_COLS)
     .single();
   if (insertError) throw insertError;
   return created as Profile;

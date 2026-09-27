@@ -11,6 +11,7 @@ import { finishJournalSession } from "@/lib/companion.functions";
 import { useVoiceSession } from "@/hooks/use-voice-session";
 import type { TranscriptLine } from "@/lib/voice/types";
 import { cn } from "@/lib/utils";
+import { profileQueryOptions } from "@/lib/profile";
 
 export const Route = createFileRoute("/_authenticated/voice/$sessionId")({
   head: () => meta("Voice reflection", "Speak with your reflection companion."),
@@ -20,18 +21,19 @@ export const Route = createFileRoute("/_authenticated/voice/$sessionId")({
 function VoicePage() {
   const { sessionId } = Route.useParams();
   const q = useQuery({ queryKey: ["messages", sessionId], queryFn: () => fetchMessages(sessionId), staleTime: Infinity });
-  if (q.isLoading) return <main className="min-h-screen bg-background p-10"><Loading /></main>;
+  const prof = useQuery(profileQueryOptions);
+  if (q.isLoading || prof.isLoading) return <main className="min-h-screen bg-background p-10"><Loading /></main>;
   if (q.isError) return <main className="min-h-screen bg-background p-10"><LoadError onRetry={() => q.refetch()} /></main>;
   const initial: TranscriptLine[] = (q.data ?? [])
     .filter((m) => m.role === "user" || m.role === "assistant")
     .map((m) => ({ id: m.id, role: m.role as "user" | "assistant", text: displayContent(m.content), final: true }));
-  return <VoiceScreen sessionId={sessionId} initial={initial} />;
+  return <VoiceScreen sessionId={sessionId} initial={initial} autoPlay={prof.data?.auto_play_responses ?? true} />;
 }
 
-function VoiceScreen({ sessionId, initial }: { sessionId: string; initial: TranscriptLine[] }) {
+function VoiceScreen({ sessionId, initial, autoPlay }: { sessionId: string; initial: TranscriptLine[]; autoPlay: boolean }) {
   const navigate = useNavigate();
   const finishFn = useServerFn(finishJournalSession);
-  const v = useVoiceSession(sessionId, initial);
+  const v = useVoiceSession(sessionId, initial, autoPlay);
   const [begun, setBegun] = useState(false);
   const [finishing, setFinishing] = useState(false);
   const [finishError, setFinishError] = useState<string | null>(null);
