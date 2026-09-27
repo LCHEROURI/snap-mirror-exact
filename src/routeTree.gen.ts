@@ -18,6 +18,7 @@ import { Route as AuthenticatedInsightsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedJournalRouteImport } from './routes/_authenticated/journal'
 import { Route as AuthenticatedMoodRouteImport } from './routes/_authenticated/mood'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedEntriesEntryIdRouteImport } from './routes/_authenticated/entries.$entryId'
 import { Route as AuthenticatedGoalsIndexRouteImport } from './routes/_authenticated/goals.index'
 import { Route as AuthenticatedGoalsGoalIdRouteImport } from './routes/_authenticated/goals.$goalId'
@@ -73,6 +74,11 @@ const AuthenticatedMoodRoute = AuthenticatedMoodRouteImport.update({
 const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedEntriesEntryIdRoute =
@@ -155,6 +161,7 @@ export interface FileRoutesByFullPath {
   '/journal': typeof AuthenticatedJournalRoute
   '/mood': typeof AuthenticatedMoodRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/entries/$entryId': typeof AuthenticatedEntriesEntryIdRoute
   '/goals/$goalId': typeof AuthenticatedGoalsGoalIdRoute
   '/people/$personId': typeof AuthenticatedPeoplePersonIdRoute
@@ -177,6 +184,7 @@ export interface FileRoutesByTo {
   '/journal': typeof AuthenticatedJournalRoute
   '/mood': typeof AuthenticatedMoodRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/entries/$entryId': typeof AuthenticatedEntriesEntryIdRoute
   '/goals/$goalId': typeof AuthenticatedGoalsGoalIdRoute
   '/people/$personId': typeof AuthenticatedPeoplePersonIdRoute
@@ -201,6 +209,7 @@ export interface FileRoutesById {
   '/_authenticated/journal': typeof AuthenticatedJournalRoute
   '/_authenticated/mood': typeof AuthenticatedMoodRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/entries/$entryId': typeof AuthenticatedEntriesEntryIdRoute
   '/_authenticated/goals/$goalId': typeof AuthenticatedGoalsGoalIdRoute
   '/_authenticated/people/$personId': typeof AuthenticatedPeoplePersonIdRoute
@@ -225,6 +234,7 @@ export interface FileRouteTypes {
     | '/journal'
     | '/mood'
     | '/onboarding'
+    | '/settings'
     | '/entries/$entryId'
     | '/goals/$goalId'
     | '/people/$personId'
@@ -247,6 +257,7 @@ export interface FileRouteTypes {
     | '/journal'
     | '/mood'
     | '/onboarding'
+    | '/settings'
     | '/entries/$entryId'
     | '/goals/$goalId'
     | '/people/$personId'
@@ -270,6 +281,7 @@ export interface FileRouteTypes {
     | '/_authenticated/journal'
     | '/_authenticated/mood'
     | '/_authenticated/onboarding'
+    | '/_authenticated/settings'
     | '/_authenticated/entries/$entryId'
     | '/_authenticated/goals/$goalId'
     | '/_authenticated/people/$personId'
@@ -353,6 +365,13 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/entries/$entryId': {
@@ -449,6 +468,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedJournalRoute: typeof AuthenticatedJournalRoute
   AuthenticatedMoodRoute: typeof AuthenticatedMoodRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedEntriesEntryIdRoute: typeof AuthenticatedEntriesEntryIdRoute
   AuthenticatedGoalsGoalIdRoute: typeof AuthenticatedGoalsGoalIdRoute
   AuthenticatedPeoplePersonIdRoute: typeof AuthenticatedPeoplePersonIdRoute
@@ -470,6 +490,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedJournalRoute: AuthenticatedJournalRoute,
   AuthenticatedMoodRoute: AuthenticatedMoodRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedEntriesEntryIdRoute: AuthenticatedEntriesEntryIdRoute,
   AuthenticatedGoalsGoalIdRoute: AuthenticatedGoalsGoalIdRoute,
   AuthenticatedPeoplePersonIdRoute: AuthenticatedPeoplePersonIdRoute,
