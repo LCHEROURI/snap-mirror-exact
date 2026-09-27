@@ -1,11 +1,12 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { BookOpen, CalendarDays, Sparkles, Settings } from "lucide-react";
+import { BookOpen, CalendarDays, MessageCircleQuestion, Sparkles, Settings } from "lucide-react";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 const NAV = [
   { to: "/journal", label: "Journal", icon: BookOpen },
   { to: "/history", label: "History", icon: CalendarDays },
+  { to: "/ask", label: "Ask", icon: MessageCircleQuestion },
   { to: "/insights", label: "Insights", icon: Sparkles },
   { to: "/settings", label: "Settings", icon: Settings },
 ] as const;

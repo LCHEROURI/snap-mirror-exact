@@ -13,7 +13,6 @@ export const ASK = {
   entryCount: 6,
   entryMinSimilarity: 0.5,
   maxQuestionChars: 500,
-  maxPerMinute: 6,
 };
 
 export const INSUFFICIENT = "I don't have enough journal history to answer that confidently yet.";
@@ -182,11 +181,3 @@ export async function askJournal(db: Db, userId: string, question: string): Prom
   return { answer, confidence, related_entries: confidence === "low" && answer === INSUFFICIENT ? [] : related_entries, range: range?.label };
 }
 
-export async function askRateOk(db: Db, userId: string, recent: Map<string, number[]>) {
-  const now = Date.now();
-  const list = (recent.get(userId) ?? []).filter((t) => now - t < 60_000);
-  if (list.length >= ASK.maxPerMinute) return false;
-  list.push(now);
-  recent.set(userId, list);
-  return true;
-}
