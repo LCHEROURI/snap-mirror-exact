@@ -20,11 +20,11 @@ async function currentUserId() {
   return data.user.id;
 }
 
-export async function createSession() {
+export async function createSession(session_type: "text" | "voice" = "text") {
   const user_id = await currentUserId();
   const { data, error } = await supabase
     .from("journal_sessions")
-    .insert({ user_id, session_type: "text", status: "active" })
+    .insert({ user_id, session_type, status: "active" })
     .select("id")
     .single();
   if (error) throw error;

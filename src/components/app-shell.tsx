@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { BookOpen, CalendarDays, Flag, MessageCircleQuestion, Sparkles, Settings } from "lucide-react";
+import { BookOpen, CalendarDays, Flag, Mic, MessageCircleQuestion, Sparkles, Settings } from "lucide-react";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
@@ -10,6 +10,15 @@ const NAV = [
   { to: "/goals", label: "Goals", icon: Flag },
   { to: "/insights", label: "Insights", icon: Sparkles },
   { to: "/settings", label: "Settings", icon: Settings },
+] as const;
+
+// Mobile: Home, Journal, Voice (centre), Insights, Goals — Ask and Settings stay reachable from Home/Insights.
+const MOBILE_NAV = [
+  { to: "/journal", label: "Home", icon: BookOpen },
+  { to: "/history", label: "Journal", icon: CalendarDays },
+  { to: "/voice", label: "Voice", icon: Mic },
+  { to: "/insights", label: "Insights", icon: Sparkles },
+  { to: "/goals", label: "Goals", icon: Flag },
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -40,10 +49,18 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       <main className="flex-1 pb-24 sm:pb-10">{children}</main>
 
-      <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-card/95 backdrop-blur sm:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur sm:hidden">
         <ul className="mx-auto flex max-w-md">
-          {NAV.map(({ to, label, icon: Icon }) => {
+          {MOBILE_NAV.map(({ to, label, icon: Icon }) => {
             const active = pathname.startsWith(to);
+            if (to === "/voice")
+              return (
+                <li key={to} className="flex flex-1 justify-center">
+                  <Link to="/voice" aria-label="Start a voice reflection" className="-mt-5 grid size-14 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                    <Icon className="size-6" />
+                  </Link>
+                </li>
+              );
             return (
               <li key={to} className="flex-1">
                 <Link

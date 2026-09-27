@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Loader2, PenLine } from "lucide-react";
+import { Loader2, PenLine, Mic } from "lucide-react";
 import { AppShell, PageHeader } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { profileQueryOptions } from "@/lib/profile";
@@ -62,6 +62,10 @@ function JournalHome() {
         subtitle="What's on your mind today? Take as long as you like — nothing here is shared."
       />
 
+      <p className="-mt-3 mb-4 flex gap-4 px-5 text-sm sm:hidden">
+        <Link to="/ask" className="text-primary underline-offset-4 hover:underline">Ask my journal</Link>
+        <Link to="/settings" className="text-muted-foreground underline-offset-4 hover:underline">Settings</Link>
+      </p>
       <div className="px-5 sm:px-10">
         <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
           <h2 className="font-serif text-xl tracking-tight">Start a reflection</h2>
@@ -71,7 +75,10 @@ function JournalHome() {
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <Button className="w-full sm:w-auto" onClick={start} disabled={starting}>
               {starting ? <Loader2 className="size-4 animate-spin" /> : <PenLine className="size-4" />}
-              Start new reflection
+              Write
+            </Button>
+            <Button variant="outline" className="w-full sm:w-auto" asChild>
+              <Link to="/voice"><Mic className="size-4" /> Talk</Link>
             </Button>
             {active && (
               <Button variant="outline" asChild className="w-full sm:w-auto">
