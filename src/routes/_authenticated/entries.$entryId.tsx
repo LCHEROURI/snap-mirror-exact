@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { deleteEntry, fetchEntry, fetchMessages, formatDate, renameEntry } from "@/lib/journal";
 import { MessageBubble } from "@/components/message-bubble";
+import { EntryAnalysis } from "@/components/entry-analysis";
+import type { JournalAnalysis } from "@/lib/ai/analysis";
 
 export const Route = createFileRoute("/_authenticated/entries/$entryId")({
   head: () => ({
@@ -111,7 +113,17 @@ function EntryDetail() {
               </p>
             </header>
 
-            <section className="mt-8">
+            <EntryAnalysis
+              entryId={entryId}
+              status={entry.data.analysis_status}
+              error={entry.data.analysis_error}
+              summary={entry.data.summary}
+              narrative={entry.data.narrative}
+              analysis={entry.data.analysis as unknown as JournalAnalysis | null}
+              onUpdated={() => { entry.refetch(); qc.invalidateQueries({ queryKey: ["entries"] }); }}
+            />
+
+            <section className="mt-10">
               <h2 className="font-serif text-lg">Transcript</h2>
               {transcript.isLoading ? (
                 <Loader2 className="mt-4 size-5 animate-spin text-muted-foreground" />
