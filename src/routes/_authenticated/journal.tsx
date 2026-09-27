@@ -7,6 +7,7 @@ import { AppShell, PageHeader } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { profileQueryOptions } from "@/lib/profile";
 import { createSession, fetchActiveSession, fetchEntries, formatDate } from "@/lib/journal";
+import { HomeTracking } from "@/components/home-tracking";
 
 export const Route = createFileRoute("/_authenticated/journal")({
   head: () => ({
@@ -79,6 +80,8 @@ function JournalHome() {
             )}
           </div>
         </div>
+
+        <HomeTracking />
 
         <section className="mt-10">
           <h2 className="font-serif text-lg tracking-tight">Recent entries</h2>

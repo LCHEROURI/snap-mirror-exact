@@ -1,34 +1,34 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Flag, Hash, SmilePlus, Users } from "lucide-react";
 import { AppShell, PageHeader } from "@/components/app-shell";
+import { meta } from "@/components/page-states";
 
 export const Route = createFileRoute("/_authenticated/insights")({
-  head: () => ({
-    meta: [
-      { title: "Insights — Reflective" },
-      { name: "description", content: "Themes, people and mood patterns drawn from your journal." },
-      { property: "og:title", content: "Insights — Reflective" },
-      { property: "og:description", content: "Themes, people and mood patterns over time." },
-    ],
-  }),
+  head: () => meta("Insights", "Topics, people, goals and mood drawn from your journal."),
   component: Insights,
 });
+
+const CARDS = [
+  { to: "/topics", title: "Topics", body: "What you write about most.", icon: Hash },
+  { to: "/people", title: "People", body: "Who shows up in your reflections.", icon: Users },
+  { to: "/mood", title: "Mood", body: "Optional check-ins over time.", icon: SmilePlus },
+  { to: "/goals", title: "Goals", body: "What you're working toward.", icon: Flag },
+] as const;
 
 function Insights() {
   return (
     <AppShell>
-      <PageHeader
-        title="Insights"
-        subtitle="Themes, people, goals and mood — drawn gently from what you've written."
-      />
-      <div className="px-5 sm:px-10">
-        <div className="rounded-2xl border border-dashed border-border px-5 py-12 text-center">
-          <p className="font-serif text-lg">Nothing to show yet</p>
-          <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
-            After a few reflections, patterns start to appear here — the topics you return to, the
-            people you mention, and how your mood moves week to week.
-          </p>
-        </div>
-      </div>
+      <PageHeader title="Insights" subtitle="Insights become more useful as your journal grows." />
+      <ul className="grid max-w-2xl gap-3 px-5 sm:grid-cols-2 sm:px-10">
+        {CARDS.map(({ to, title, body, icon: Icon }) => (
+          <li key={to}>
+            <Link to={to} className="flex gap-3 rounded-2xl border border-border bg-card p-5 hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              <Icon className="mt-0.5 size-5 text-primary" aria-hidden />
+              <span><span className="block font-serif text-lg">{title}</span><span className="text-sm text-muted-foreground">{body}</span></span>
+            </Link>
+          </li>
+        ))}
+      </ul>
     </AppShell>
   );
 }
