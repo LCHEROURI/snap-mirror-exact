@@ -8,9 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    mode: search["mode"] === "signin" ? ("signin" as const) : ("signup" as const),
-  }),
+  validateSearch: (search: Record<string, unknown>): { mode?: "signin" | "signup" } =>
+    search["mode"] === "signin" ? { mode: "signin" } : {},
   head: () => ({
     meta: [
       { title: "Sign in — Reflective" },
