@@ -3,7 +3,7 @@
   "short_name": "Reflective",
   "description": "A private AI journal and reflection companion.",
   "id": "/",
-  "start_url": "/home",
+  "start_url": "/journal",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
