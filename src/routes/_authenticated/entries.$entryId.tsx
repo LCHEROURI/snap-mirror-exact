@@ -21,6 +21,7 @@ import { deleteEntry, fetchEntry, fetchMessages, formatDate, renameEntry } from 
 import { MessageBubble } from "@/components/message-bubble";
 import { EntryAnalysis } from "@/components/entry-analysis";
 import { EntryTracking } from "@/components/entry-tracking";
+import { FirstReflectionCard } from "@/components/first-reflection-card";
 import type { JournalAnalysis } from "@/lib/ai/analysis";
 
 export const Route = createFileRoute("/_authenticated/entries/$entryId")({
@@ -109,6 +110,7 @@ function EntryDetail() {
           </div>
         ) : (
           <>
+            <FirstReflectionCard entryId={entryId} />
             <header className="mt-4">
               {editing ? (
                 <form

@@ -8,7 +8,14 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { MessageBubble } from "@/components/message-bubble";
 import { useOnline } from "@/hooks/use-online";
-import { fetchMessages, fetchSession, setSessionStatus, type JournalMessage } from "@/lib/journal";
+import {
+  entryCountQueryOptions,
+  fetchMessages,
+  fetchSession,
+  setSessionStatus,
+  type JournalMessage,
+} from "@/lib/journal";
+import { trackEvent } from "@/lib/product-events";
 import {
   finishJournalSession,
   retryJournalReply,
@@ -26,6 +33,12 @@ export const Route = createFileRoute("/_authenticated/write/$sessionId")({
   }),
   component: WriteSession,
 });
+
+const STARTERS = [
+  "Something has been on my mind lately…",
+  "Today I keep thinking about…",
+  "Right now I'm feeling…",
+];
 
 function authOrNetwork(e: unknown) {
   return e instanceof Error && /unauthori[sz]ed/i.test(e.message)
@@ -67,6 +80,9 @@ function WriteSession() {
     queryFn: () => fetchMessages(sessionId),
   });
 
+  const entryCount = useQuery(entryCountQueryOptions);
+  const isFirstReflection = entryCount.data === 0;
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages.data?.length, sending]);
@@ -86,6 +102,8 @@ function WriteSession() {
     try {
       const res = await sendFn({ data: { sessionId, message: text } });
       if (res.ok) {
+        if (isFirstReflection && !list.some((m) => m.role === "user"))
+          trackEvent("first_message_sent");
         append(res.userMessage);
         append(res.assistantMessage);
         setDraft("");
@@ -139,6 +157,7 @@ function WriteSession() {
     try {
       const res = await finishFn({ data: { sessionId } });
       if (!res.ok) throw new Error(res.error);
+      if (isFirstReflection) trackEvent("first_reflection_completed");
       qc.invalidateQueries();
       if (res.analysisDeferred)
         toast.message(
@@ -229,10 +248,39 @@ function WriteSession() {
         <ol className="mx-auto flex max-w-2xl flex-col gap-4 px-4 py-6 sm:px-6" aria-live="polite">
           {list.length === 0 && (
             <li className="py-16 text-center">
-              <p className="font-serif text-2xl">What's on your mind?</p>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Start anywhere. A sentence is enough.
-              </p>
+              {isFirstReflection ? (
+                <>
+                  <p className="font-serif text-2xl">Start anywhere.</p>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    You don't need to write perfectly. A sentence is enough.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="font-serif text-2xl">What's on your mind?</p>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Start anywhere. A sentence is enough.
+                  </p>
+                </>
+              )}
+            </li>
+          )}
+          {isFirstReflection && !hasUser && !completed && (
+            <li>
+              <p className="mb-2 text-center text-xs text-muted-foreground">Or begin with</p>
+              <ul className="flex flex-col items-center gap-2" aria-label="Starter prompts">
+                {STARTERS.map((s) => (
+                  <li key={s}>
+                    <button
+                      type="button"
+                      onClick={() => setDraft(s)}
+                      className="min-h-11 rounded-full border border-border bg-card px-4 py-2 text-sm text-foreground transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    >
+                      {s}
+                    </button>
+                  </li>
+                ))}
+              </ul>
             </li>
           )}
           {list.map((m) => (
