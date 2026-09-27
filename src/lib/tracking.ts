@@ -6,7 +6,11 @@ export type GoalStatus = "active" | "paused" | "completed" | "archived";
 export const GOAL_STATUSES: GoalStatus[] = ["active", "paused", "completed", "archived"];
 export type NextAction = { text: string; done: boolean };
 
-function ok<T>(r: { data: T; error: unknown }): T {
+function ok<T>(r: { data: T; error: unknown }): NonNullable<T> {
+  if (r.error) throw r.error;
+  return (r.data ?? []) as NonNullable<T>;
+}
+function one<T>(r: { data: T | null; error: unknown }): T | null {
   if (r.error) throw r.error;
   return r.data;
 }
@@ -20,12 +24,12 @@ export async function fetchGoals() {
 }
 
 export async function fetchGoal(id: string) {
-  const goal = ok(await supabase.from("goals").select("*").eq("id", id).maybeSingle());
+  const goal = one(await supabase.from("goals").select("*").eq("id", id).maybeSingle());
   if (!goal) return null;
   const [checkins, source] = await Promise.all([
     supabase.from("goal_checkins").select("id, note, progress, created_at").eq("goal_id", id).order("created_at", { ascending: false }).then(ok),
     goal.created_from_entry_id
-      ? supabase.from("journal_entries").select("id, title, completed_at").eq("id", goal.created_from_entry_id).maybeSingle().then(ok)
+      ? supabase.from("journal_entries").select("id, title, completed_at").eq("id", goal.created_from_entry_id).maybeSingle().then(one)
       : Promise.resolve(null),
   ]);
   // Journal mentions: entries whose analysis mentions the goal title (deterministic text match).
@@ -88,7 +92,7 @@ export async function fetchTopics() {
 }
 
 export async function fetchTopic(id: string) {
-  const topic = ok(await supabase.from("topics").select("id, name").eq("id", id).maybeSingle());
+  const topic = one(await supabase.from("topics").select("id, name").eq("id", id).maybeSingle());
   if (!topic) return null;
   const links = ok(await supabase.from("entry_topics").select("journal_entries(id, title, summary, completed_at)").eq("topic_id", id));
   const entries = links.map((l) => l.journal_entries as { id: string; title: string; summary: string | null; completed_at: string } | null).filter(Boolean) as { id: string; title: string; summary: string | null; completed_at: string }[];
@@ -124,7 +128,7 @@ export async function fetchPeople() {
 }
 
 export async function fetchPerson(id: string) {
-  const person = ok(await supabase.from("people").select("id, name, relationship, notes").eq("id", id).maybeSingle());
+  const person = one(await supabase.from("people").select("id, name, relationship, notes").eq("id", id).maybeSingle());
   if (!person) return null;
   const links = ok(await supabase.from("entry_people").select("entry_id, journal_entries(id, title, summary, completed_at)").eq("person_id", id));
   const entries = (links.map((l) => l.journal_entries).filter(Boolean) as { id: string; title: string; summary: string | null; completed_at: string }[]).sort((a, b) => b.completed_at.localeCompare(a.completed_at));
@@ -170,7 +174,7 @@ export async function fetchEntryTags(entryId: string) {
   const [t, p, m] = await Promise.all([
     supabase.from("entry_topics").select("topics(id, name)").eq("entry_id", entryId).then(ok),
     supabase.from("entry_people").select("people(id, name)").eq("entry_id", entryId).then(ok),
-    supabase.from("mood_entries").select("score, label").eq("journal_entry_id", entryId).maybeSingle().then(ok),
+    supabase.from("mood_entries").select("score, label").eq("journal_entry_id", entryId).maybeSingle().then(one),
   ]);
   const goals = ok(await supabase.from("goals").select("id, title").eq("created_from_entry_id", entryId));
   return {

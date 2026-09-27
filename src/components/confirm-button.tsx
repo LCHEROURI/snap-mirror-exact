@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 
 export function ConfirmButton({ label, title, description, confirm, onConfirm, variant = "outline", size = "sm", disabled }: {
   label: ReactNode; title: string; description: string; confirm: string; onConfirm: () => void;
-  variant?: "outline" | "ghost" | "destructive"; size?: "sm" | "default"; disabled?: boolean;
+  variant?: "outline" | "ghost" | "destructive"; size?: "sm" | "default"; disabled?: boolean | undefined;
 }) {
   return (
     <AlertDialog>
