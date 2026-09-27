@@ -134,3 +134,17 @@ export function formatDate(iso: string, withTime = false) {
     ...(withTime ? { hour: "numeric", minute: "2-digit" } : {}),
   });
 }
+
+/** Number of saved journal entries for the signed-in user (RLS-scoped). */
+export async function countEntries() {
+  const { count, error } = await supabase
+    .from("journal_entries")
+    .select("id", { count: "exact", head: true });
+  if (error) throw error;
+  return count ?? 0;
+}
+
+export const entryCountQueryOptions = {
+  queryKey: ["entries", "count"] as const,
+  queryFn: countEntries,
+};
