@@ -127,8 +127,7 @@ export async function askJournal(db: Db, userId: string, question: string): Prom
       query_embedding: vec(qv),
       match_count: ASK.entryCount,
       min_similarity: range ? 0.3 : ASK.entryMinSimilarity, // date filter already narrows the pool
-      from_ts: range?.from.toISOString(),
-      to_ts: range?.to.toISOString(),
+      ...(range ? { from_ts: range.from.toISOString(), to_ts: range.to.toISOString() } : {}),
     }),
   ]);
   if (entRes.error || memRes.error) {
@@ -136,7 +135,7 @@ export async function askJournal(db: Db, userId: string, question: string): Prom
     throw new AskError("search", "Couldn't search your journal just now. Please try again.");
   }
   let memories = memRes.data ?? [];
-  const entries = [...(entRes.data ?? [])];
+  const entries: { id: string; title: string; summary: string | null; completed_at: string; similarity: number }[] = [...(entRes.data ?? [])];
 
   // Pull in source entries of strong memories (ownership enforced by RLS).
   const extraIds = [...new Set(memories.map((m) => m.journal_entry_id).filter(Boolean))].filter((id) => !entries.some((e) => e.id === id)) as string[];
