@@ -256,6 +256,7 @@ export type Database = {
       }
       journal_messages: {
         Row: {
+          client_item_id: string | null
           content: string
           created_at: string
           id: string
@@ -264,6 +265,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          client_item_id?: string | null
           content: string
           created_at?: string
           id?: string
@@ -272,6 +274,7 @@ export type Database = {
           user_id?: string
         }
         Update: {
+          client_item_id?: string | null
           content?: string
           created_at?: string
           id?: string
@@ -515,6 +518,7 @@ export type Database = {
           reminder_preference: string
           timezone: string | null
           updated_at: string
+          voice_enabled: boolean
         }
         Insert: {
           ai_memory_enabled?: boolean
@@ -527,6 +531,7 @@ export type Database = {
           reminder_preference?: string
           timezone?: string | null
           updated_at?: string
+          voice_enabled?: boolean
         }
         Update: {
           ai_memory_enabled?: boolean
@@ -539,6 +544,7 @@ export type Database = {
           reminder_preference?: string
           timezone?: string | null
           updated_at?: string
+          voice_enabled?: boolean
         }
         Relationships: []
       }
