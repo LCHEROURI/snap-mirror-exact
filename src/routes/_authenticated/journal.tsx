@@ -62,6 +62,10 @@ function JournalHome() {
         subtitle="What's on your mind today? Take as long as you like — nothing here is shared."
       />
 
+      <p className="-mt-3 mb-4 flex gap-4 px-5 text-sm sm:hidden">
+        <Link to="/ask" className="text-primary underline-offset-4 hover:underline">Ask my journal</Link>
+        <Link to="/settings" className="text-muted-foreground underline-offset-4 hover:underline">Settings</Link>
+      </p>
       <div className="px-5 sm:px-10">
         <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
           <h2 className="font-serif text-xl tracking-tight">Start a reflection</h2>
